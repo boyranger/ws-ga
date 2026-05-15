@@ -1,5 +1,7 @@
 """Formatting helpers for Repo Readiness Agent product output."""
 
+from __future__ import annotations
+
 from .contract import ProductReport
 
 
