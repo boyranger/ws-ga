@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NalaraHub Code</title>
+    <meta
+      name="description"
+      content="Frontend sederhana untuk code.nalarahub.my.id — siap disambungkan ke backend Python dan Google Auth."
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                50: '#eef7ff',
+                100: '#d9edff',
+                500: '#2563eb',
+                600: '#1d4ed8',
+                700: '#1e40af',
+                900: '#0f172a'
+              }
+            },
+            boxShadow: {
+              glow: '0 20px 60px rgba(37, 99, 235, 0.25)'
+            }
+          }
+        }
+      };
+    </script>
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <div class="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(37,99,235,0.18),_transparent_35%),linear-gradient(to_bottom,_#020617,_#0f172a)]"></div>
+
+    <header class="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6 lg:px-8">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-[0.3em] text-blue-300">NalaraHub</p>
+        <h1 class="mt-2 text-xl font-bold text-white">code.nalarahub.my.id</h1>
+      </div>
+      <a
+        href="#preview"
+        class="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-blue-400/50 hover:bg-blue-500/10 hover:text-white"
+      >
+        Lihat Preview
+      </a>
+    </header>
+
+    <main class="mx-auto flex min-h-[calc(100vh-88px)] w-full max-w-6xl items-center px-6 pb-16 lg:px-8">
+      <section class="grid w-full gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+        <div>
+          <span class="inline-flex items-center rounded-full border border-blue-400/30 bg-blue-500/10 px-3 py-1 text-sm text-blue-200">
+            Frontend awal • HTML + Tailwind CDN
+          </span>
+          <h2 class="mt-6 text-4xl font-black leading-tight text-white sm:text-5xl lg:text-6xl">
+            Tempat sederhana untuk mulai bangun
+            <span class="text-blue-400">NalaraHub Code</span>
+          </h2>
+          <p class="mt-6 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
+            Ini landing page awal untuk <strong>code.nalarahub.my.id</strong>. Masih ringan, belum ribet,
+            dan sengaja dibuat tanpa node_modules supaya gampang langsung dipakai lalu disambungkan ke
+            backend Python, Google Auth, dan fitur berikutnya.
+          </p>
+
+          <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+            <a
+              href="#preview"
+              class="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-glow transition hover:bg-blue-500"
+            >
+              Preview struktur
+            </a>
+            <a
+              href="mailto:hello@nalarahub.my.id"
+              class="inline-flex items-center justify-center rounded-2xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-slate-100 transition hover:border-white/30 hover:bg-white/10"
+            >
+              Kontak dulu
+            </a>
+          </div>
+
+          <div class="mt-10 grid gap-4 sm:grid-cols-3">
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
+              <p class="text-sm text-slate-400">Frontend</p>
+              <p class="mt-2 text-lg font-semibold text-white">HTML biasa</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
+              <p class="text-sm text-slate-400">Styling</p>
+              <p class="mt-2 text-lg font-semibold text-white">Tailwind CDN</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
+              <p class="text-sm text-slate-400">Tahap lanjut</p>
+              <p class="mt-2 text-lg font-semibold text-white">Python + Google Auth</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="preview" class="rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-2xl backdrop-blur-xl">
+          <div class="rounded-[1.5rem] border border-white/10 bg-slate-900/80 p-6">
+            <div class="flex items-center gap-2">
+              <span class="h-3 w-3 rounded-full bg-rose-400"></span>
+              <span class="h-3 w-3 rounded-full bg-amber-400"></span>
+              <span class="h-3 w-3 rounded-full bg-emerald-400"></span>
+            </div>
+
+            <div class="mt-6 rounded-2xl border border-blue-500/20 bg-slate-950/70 p-5">
+              <p class="text-xs uppercase tracking-[0.25em] text-blue-300">Planned flow</p>
+              <ol class="mt-4 space-y-3 text-sm text-slate-300">
+                <li><span class="font-semibold text-white">1.</span> User buka halaman utama</li>
+                <li><span class="font-semibold text-white">2.</span> Klik tombol login Google</li>
+                <li><span class="font-semibold text-white">3.</span> Backend Python verifikasi OAuth</li>
+                <li><span class="font-semibold text-white">4.</span> User masuk ke dashboard</li>
+              </ol>
+            </div>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p class="text-sm text-slate-400">Mode sekarang</p>
+                <p class="mt-2 font-semibold text-white">Static landing page</p>
+                <p class="mt-2 text-sm leading-6 text-slate-300">
+                  Cocok buat pasang cepat sambil nunggu backend dan auth disambung.
+                </p>
+              </div>
+              <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p class="text-sm text-slate-400">Mode berikutnya</p>
+                <p class="mt-2 font-semibold text-white">Authenticated app</p>
+                <p class="mt-2 text-sm leading-6 text-slate-300">
+                  Tinggal tambah endpoint login, callback OAuth, dan session user.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
