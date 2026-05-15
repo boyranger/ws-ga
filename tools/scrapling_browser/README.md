@@ -2,6 +2,8 @@
 
 This workspace includes a small helper for web browsing/surfing with [Scrapling](https://github.com/D4Vinci/Scrapling).
 
+Primary intended use in this workspace: browse GitHub pages and inspect repositories/code snippets that look relevant to Mahdy's request.
+
 ## Folder layout
 
 Everything for this tool lives in one folder:

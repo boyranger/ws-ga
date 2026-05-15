@@ -41,6 +41,8 @@ Add whatever helps you do your job. This is your cheat sheet.
 
 ## Scrapling web browsing
 
+Purpose: browse the web — especially GitHub repos/pages — to find code relevant to Mahdy's request.
+
 ### Local helper
 
 - Folder: `tools/scrapling_browser`
