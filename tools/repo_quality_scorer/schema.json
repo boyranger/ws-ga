@@ -13,6 +13,9 @@
     "maturity_level",
     "code_quality_score",
     "production_readiness_score",
+    "founder_gates",
+    "follow_up_status_options",
+    "monitoring_stop_conditions",
     "breakdown",
     "strengths",
     "risks",
@@ -41,7 +44,7 @@
     },
     "maturity_level": {
       "type": "string",
-      "enum": ["Prototype", "MVP", "Maturing", "Production-capable"]
+      "enum": ["Prototype", "MVP", "Handoff-ready"]
     },
     "code_quality_score": {
       "type": "number",
@@ -52,6 +55,24 @@
       "type": "number",
       "minimum": 1,
       "maximum": 10
+    },
+    "founder_gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["demo_safe", "launch_ready", "handoff_ready"],
+      "properties": {
+        "demo_safe": { "type": "string", "enum": ["yes", "not yet"] },
+        "launch_ready": { "type": "string", "enum": ["yes", "not yet"] },
+        "handoff_ready": { "type": "string", "enum": ["yes", "not yet"] }
+      }
+    },
+    "follow_up_status_options": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["Improved", "Unchanged", "Still blocked"] }
+    },
+    "monitoring_stop_conditions": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["Target reached", "Keep monitoring"] }
     },
     "breakdown": {
       "type": "object",
