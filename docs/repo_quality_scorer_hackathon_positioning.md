@@ -226,6 +226,9 @@ If the answer is mostly no, do not prioritize it for the hackathon scope.
 
 ## Submission-ready short form
 
+For the copy-paste submission artifact, see `docs/hackathon_submission.md`.
+
+
 **Product:** Repo Readiness Agent
 
 **User:** Solo founders
