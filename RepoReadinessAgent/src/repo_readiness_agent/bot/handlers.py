@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from ..formatter import render_text_report
 from .service import NotFoundError, RepoTrackingService, ValidationError
+
+_GITHUB_URL_RE = re.compile(r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+(?:\.git)?/?")
 
 
 def _telegram_user_parts(update: Any) -> tuple[str, str | None, str | None, str | None]:
@@ -203,3 +206,96 @@ async def untrack_handler(update: Any, context: Any) -> None:
         await update.effective_message.reply_text(str(exc))
     except Exception as exc:
         await update.effective_message.reply_text(f"Gagal mematikan tracking: {exc}")
+
+
+def _extract_github_url(text: str) -> str | None:
+    match = _GITHUB_URL_RE.search(text)
+    return match.group(0) if match else None
+
+
+async def conversational_message_handler(update: Any, context: Any) -> None:
+    if not update.effective_message or not update.effective_message.text:
+        return
+
+    text = update.effective_message.text.strip()
+    if text.startswith("/"):
+        return
+
+    lowered = text.lower()
+    user_id, username, first_name, last_name = _telegram_user_parts(update)
+    service: RepoTrackingService = context.application.bot_data["repo_tracking_service"]
+    repo_url = _extract_github_url(text)
+
+    try:
+        if repo_url and any(keyword in lowered for keyword in ["track", "pantau", "monitor"]):
+            tracked = service.enable_tracking(
+                telegram_user_id=user_id,
+                username=username,
+                first_name=first_name,
+                last_name=last_name,
+                repo_url=repo_url,
+            )
+            await update.effective_message.reply_text(
+                f"Siap, repo ini sekarang saya track.\nTracking ID: {tracked.id}\nRepo: {tracked.repo_normalized}\n\nKalau mau cek update nanti, pakai /followup {tracked.id} atau bilang saja minta cek ulang repo ini."
+            )
+            return
+
+        if repo_url and any(keyword in lowered for keyword in ["inspect", "inspeksi", "cek", "review", "nilai", "analyze", "analisa"]):
+            result = service.inspect_repo(
+                telegram_user_id=user_id,
+                username=username,
+                first_name=first_name,
+                last_name=last_name,
+                repo_url=repo_url,
+            )
+            await update.effective_message.reply_text(
+                f"Saya sudah cek repo ini.\nTracking ID: {result.tracking_id}\n\n{result.rendered_text}\n\nKalau kamu mau, lanjut bilang \"track repo ini\" atau pakai /track {repo_url}."
+            )
+            return
+
+        if any(keyword in lowered for keyword in ["repo saya", "my repos", "myrepo", "myrepos", "repos saya", "tracked repo"]):
+            repos = service.list_repos_for_user(
+                telegram_user_id=user_id,
+                username=username,
+                first_name=first_name,
+                last_name=last_name,
+            )
+            if not repos:
+                await update.effective_message.reply_text("Kamu belum punya repo yang di-track. Kirim link GitHub dan bilang mau saya cek atau track.")
+                return
+            lines = ["Ini repo yang sedang kamu track:"]
+            for item in repos:
+                latest = f"{item.latest_stage} / {item.latest_confidence}" if item.latest_stage else "belum ada report"
+                lines.append(f"- #{item.tracking_id} {item.repo_normalized} [{item.status}] — {latest}")
+            await update.effective_message.reply_text("\n".join(lines))
+            return
+
+        if any(keyword in lowered for keyword in ["help", "bantuan", "cara pakai", "gimana pakainya"]):
+            await help_handler(update, context)
+            return
+
+        if repo_url:
+            await update.effective_message.reply_text(
+                "Saya lihat kamu kirim link repo GitHub.\n\n"
+                "Kamu bisa bilang misalnya:\n"
+                f"- cek repo ini {repo_url}\n"
+                f"- track repo ini {repo_url}\n\n"
+                "Atau pakai command:\n"
+                f"- /inspect {repo_url}\n"
+                f"- /track {repo_url}"
+            )
+            return
+
+        await update.effective_message.reply_text(
+            "Aku bisa bantu cek kesiapan repo GitHub kamu secara natural juga.\n\n"
+            "Contoh:\n"
+            "- cek repo ini https://github.com/owner/repo\n"
+            "- track repo ini https://github.com/owner/repo\n"
+            "- lihat repo saya\n"
+            "- bantuan\n\n"
+            "Kalau mau jalur eksplisit, ketik /help untuk lihat semua command."
+        )
+    except (ValidationError, NotFoundError) as exc:
+        await update.effective_message.reply_text(str(exc))
+    except Exception as exc:
+        await update.effective_message.reply_text(f"Maaf, saya gagal memproses pesan itu: {exc}")

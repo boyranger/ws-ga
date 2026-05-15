@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 
 from .handlers import (
+    conversational_message_handler,
     followup_handler,
     help_handler,
     inspect_handler,
@@ -40,7 +41,7 @@ def build_service() -> RepoTrackingService:
 def main() -> None:
     try:
         from telegram import BotCommand
-        from telegram.ext import Application, CommandHandler
+        from telegram.ext import Application, CommandHandler, MessageHandler, filters
     except ImportError as exc:
         raise SystemExit(
             "python-telegram-bot is not installed. Install it before running the public bot runtime."
@@ -66,6 +67,7 @@ def main() -> None:
     application.add_handler(CommandHandler("report", report_handler))
     application.add_handler(CommandHandler("followup", followup_handler))
     application.add_handler(CommandHandler("untrack", untrack_handler))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, conversational_message_handler))
 
     application.run_polling()
 
