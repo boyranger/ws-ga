@@ -208,6 +208,13 @@ PYTHONPATH=src .venv/bin/python -m repo_readiness_agent.cli followup \
 
 ---
 
+## Demo video
+
+Watch the short demo here:
+- <https://youtube.com/shorts/2_uDVw3i7Jc?feature=share>
+
+---
+
 ## Fastest demo path
 
 If you need the quickest reliable demo flow:
