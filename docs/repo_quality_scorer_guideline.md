@@ -1,8 +1,15 @@
 # repo_quality_scorer - Guideline & Scope v1
 
+> Hackathon scope note: for founder-facing hackathon positioning and scope guardrails, also see `docs/repo_quality_scorer_hackathon_positioning.md`.
+
 ## Purpose
 
 `repo_quality_scorer` is a repository-level evaluation tool for scoring code quality and production readiness from a GitHub repository URL.
+
+For the hackathon version, the preferred outward-facing framing is:
+- **Repo Readiness Agent**
+- primary user: **solo founder / indie hacker**
+- core job: determine whether a repo is still a Prototype, already an MVP, or ready for handoff
 
 It is designed to sit above low-level analyzers such as `code-quality-check`.
 
