@@ -25,6 +25,9 @@ Show, in a short live flow, that Repo Readiness Agent can turn a GitHub reposito
 Suggested close:
 > Repo Readiness Agent turns repository evidence into a founder decision.
 
+Suggested sample to open first:
+- `examples/sample_outputs/qris_payment_bot_report.txt`
+
 ---
 
 ## 2-minute version
@@ -62,6 +65,11 @@ Instead of giving raw code warnings only, the product gives a founder decision.
 For submitted repositories, the agent can re-check progress later and notify whether the repo improved, stayed unchanged, or is still blocked — then stop once the founder's target confidence/readiness state is reached.
 
 This is useful to explain that autonomy is not only about one-time analysis, but also about follow-up behavior over time.
+
+Suggested follow-up artifacts to show:
+- `examples/sample_outputs/qris_payment_bot_followup_before.json`
+- `examples/sample_outputs/qris_payment_bot_followup_after.json`
+- `examples/sample_outputs/qris_payment_bot_followup_result.json`
 
 ---
 

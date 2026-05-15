@@ -59,3 +59,10 @@ When presenting, emphasize:
 - the product gives a founder decision, not just a code score
 - the output is actionable: stage, risks, and next fixes
 - the follow-up loop makes the product feel like a real agent over time
+
+## 7. Suggested demo assets
+
+Open these assets first during presentation prep:
+- `examples/sample_outputs/qris_payment_bot_report.txt`
+- `examples/sample_outputs/qris_payment_bot_report.json`
+- `examples/sample_outputs/qris_payment_bot_followup_result.json`
