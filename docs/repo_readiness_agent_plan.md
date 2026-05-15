@@ -54,10 +54,19 @@ A single-agent flow is cleaner:
 Autonomy does not require multi-agent orchestration.
 
 A single agent can still be clearly autonomous if it:
+- accepts the repository input and starts analysis on its own
 - chooses what signals matter
 - inspects the repository independently
 - synthesizes findings into a judgment
 - prioritizes next actions without manual step-by-step prompting
+
+For presentation, describe the autonomy as a full loop:
+- **Observe** -> read repo structure, files, and delivery signals
+- **Interpret** -> decide which technical evidence matters
+- **Judge** -> assign stage and verdict
+- **Guide** -> propose the next fixes in priority order
+
+This is what makes the product feel like an agent rather than a passive report generator.
 
 ---
 
@@ -336,6 +345,77 @@ The product is ready enough when all of the following are true:
 
 ---
 
+## Parallel execution plan for tonight
+
+Target delivery deadline: **10:00 PM tonight**.
+
+Because the hackathon work is being handled by **Mahdy and Fauzi as a 2-person team**, Clara should treat implementation planning as parallelizable work.
+
+### Team model
+- **Clara** -> builder agent, planner, reviewer, artifact writer, implementation support
+- **Mahdy** -> product direction, pitch quality, final product decisions, implementation coordination
+- **Fauzi** -> builder teammate who can execute implementation, testing, polish, or supporting setup in parallel
+
+### WBS / Todo list
+
+#### Track A - Product output alignment
+**Owner:** Clara + builder
+- [ ] Align stage labels to `Prototype`, `MVP`, `Handoff-ready`
+- [ ] Make verdicts founder-friendly
+- [ ] Ensure output highlights: stage, verdict, top risks, top 3 fixes
+- [ ] Verify sample output on at least one demo repo
+
+#### Track B - Product identity and positioning
+**Owner:** Clara + Mahdy
+- [ ] Create `docs/repo_readiness_agent_identity.md`
+- [ ] Tighten autonomous explanation for presentation
+- [ ] Ensure wording is consistent across positioning, submission, and output
+
+#### Track C - Demo readiness
+**Owner:** Mahdy + Fauzi
+- [ ] Choose 1-2 demo repos
+- [ ] Decide the preferred demo path
+- [ ] Capture expected output snippets for presentation
+- [ ] Prepare a 30-second and 2-minute demo flow
+
+#### Track D - Implementation verification
+**Owner:** Fauzi + Clara
+- [ ] Run scorer on chosen sample repos
+- [ ] Check that JSON/text output remains coherent
+- [ ] Identify any last confusing output wording
+- [ ] Confirm no critical blocker in the demo path
+
+### Recommended parallel split
+
+#### Mahdy
+- Own presentation quality and final product framing
+- Review wording, demo story, and founder clarity
+- Decide what should be shown live versus described
+
+#### Fauzi
+- Own implementation assistance in parallel
+- Run tests, sample executions, or output checks
+- Help tighten the demo path and reduce technical friction
+
+#### Clara
+- Keep the scope stable
+- Write/update artifacts
+- refine wording
+- support implementation and review outputs
+- keep all pieces aligned to the hackathon positioning
+
+### Must-have by 10 PM
+- [ ] Single-agent product story is stable
+- [ ] Tool output uses founder-facing stage language
+- [ ] Repo Readiness Agent identity doc exists
+- [ ] Demo flow exists in document form
+- [ ] At least one strong demo repo/output pair is ready
+
+### Nice-to-have by 10 PM
+- [ ] Second demo repo
+- [ ] Cleaner explainability fields
+- [ ] More polished README wording
+
 ## Current recommendation
 
 Next implementation priority:
@@ -343,4 +423,5 @@ Next implementation priority:
 1. align `repo_quality_scorer` output with Prototype / MVP / Handoff-ready
 2. define `docs/repo_readiness_agent_identity.md`
 3. create demo script artifact
-4. polish sample outputs and submission consistency
+4. verify demo repo outputs
+5. polish submission consistency

@@ -103,11 +103,20 @@ Instead of showing only technical warnings, it tells the founder what stage the 
 ### Autonomous
 
 The agent independently:
+- accepts a GitHub repository as input
 - decides what repository signals matter
-- inspects relevant files and project structure
+- inspects relevant files, project structure, and delivery signals
 - runs supporting analysis when applicable
 - synthesizes a maturity judgment
 - prioritizes the next actions without step-by-step user direction
+
+For presentation, the autonomy should be explained as a complete decision loop:
+1. **Observe** -> ingest repo URL and inspect the repository
+2. **Interpret** -> determine which engineering signals are meaningful
+3. **Judge** -> classify the repo as Prototype, MVP, or Handoff-ready
+4. **Recommend** -> produce the top risks and the next fixes
+
+The important point is that the user does not need to manually tell the system which folders to read, which checks to run, or how to interpret the findings. The agent performs the judgment workflow end-to-end.
 
 ### Creativity
 

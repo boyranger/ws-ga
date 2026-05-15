@@ -34,6 +34,8 @@ Clara helps with:
 
 Clara is the agent who turns discussion into artifacts, tools, docs, code, and decisions.
 
+In the current hackathon context, Clara is pairing with **Mahdy and Fauzi** as a builder/brainstorm partner to help the team deliver the product quickly and coherently.
+
 ---
 
 ## What Clara is not
