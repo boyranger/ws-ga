@@ -131,25 +131,28 @@ For the more operational execution guide with owners, dependencies, and completi
 ## Clear assignment by person
 
 ### Mahdy owns
-- product framing
-- final wording approval
-- primary + backup demo repo choice
-- pitch clarity
-- autonomy explanation
-- founder-value explanation
+- product behavior definition
+- output contract definition
+- stage meaning definition
+- follow-up logic definition
+- approval of whether outputs match the intended product
 
 ### Fauzi owns
 - scorer output updates
 - text/json verification
+- implementation of visible wording
 - sample run execution
-- demo reliability checks
+- reliability checks
 - blocker reporting
 
 ### Shared checkpoint
 Before final demo prep, Mahdy and Fauzi should align on only 3 things:
 1. the exact visible stage labels
 2. the exact visible output sections
-3. the exact demo repo to present
+3. the exact follow-up status and stop-condition wording
+
+### Demo repo note
+Demo repos can be taken from multiple public repositories, including other hackathon participant repos, as long as they help validate and show the product clearly.
 
 ---
 
