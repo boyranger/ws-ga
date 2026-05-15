@@ -13,6 +13,7 @@ Early v1 implementation.
 ## Files
 
 - `repo_quality_scorer.py` - CLI scorer
+- `schema.json` - JSON output contract
 - `rubric.md` - scoring rubric snapshot
 - `README.md` - usage notes
 
@@ -36,6 +37,14 @@ python3 tools/repo_quality_scorer/repo_quality_scorer.py /path/to/repo
 python3 tools/repo_quality_scorer/repo_quality_scorer.py https://github.com/mahdyarief/qris-payment-bot --format json
 ```
 
+The JSON output now includes:
+- `schema_version`
+- stable top-level score fields
+- `facts` for raw repository evidence
+
+Schema reference:
+- `tools/repo_quality_scorer/schema.json`
+
 ## Current behavior
 
 The scorer currently:
@@ -48,6 +57,7 @@ The scorer currently:
   - Code Quality Score
   - Production Readiness Score
 - renders text or JSON
+- exposes a versioned JSON contract via `schema.json`
 
 ## Current limitations
 

@@ -1,2 +1,3 @@
 .openclaw/
 tools/scrapling_browser/.venv/
+__pycache__/

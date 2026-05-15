@@ -14,6 +14,8 @@ from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Any
 
+SCHEMA_VERSION = "1.0.0"
+
 ROOT = Path(__file__).resolve().parent
 WORKSPACE = ROOT.parent.parent
 
@@ -103,6 +105,7 @@ class RepoFacts:
 
 @dataclass
 class ScoreReport:
+    schema_version: str
     repo: str
     local_path: str
     confidence: str
@@ -561,6 +564,7 @@ def compute_report(repo_url: str, repo_path: Path, branch: str | None) -> ScoreR
     confidence = confidence_for(facts)
 
     return ScoreReport(
+        schema_version=SCHEMA_VERSION,
         repo=repo_url,
         local_path=str(repo_path),
         confidence=confidence,
