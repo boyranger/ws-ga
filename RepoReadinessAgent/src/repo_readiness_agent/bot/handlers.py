@@ -274,6 +274,58 @@ async def conversational_message_handler(update: Any, context: Any) -> None:
             await help_handler(update, context)
             return
 
+        latest_analysis = service.get_latest_analysis_for_user(
+            telegram_user_id=user_id,
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+        )
+        if latest_analysis:
+            report = latest_analysis.report
+            tracked_repo = latest_analysis.tracked_repo
+
+            if any(keyword in lowered for keyword in ["risk utama", "risiko utama", "masalah utama", "top risk"]):
+                risks = "\n".join(f"- {risk}" for risk in report.top_risks)
+                await update.effective_message.reply_text(
+                    f"Dari analisis terakhir untuk {tracked_repo.repo_normalized}, risiko utamanya adalah:\n{risks}"
+                )
+                return
+
+            if any(keyword in lowered for keyword in ["fix", "perbaikan", "langkah berikutnya", "next step", "apa yang harus dilakukan"]):
+                fixes = "\n".join(f"- {fix}" for fix in report.top_fixes)
+                await update.effective_message.reply_text(
+                    f"Untuk repo {tracked_repo.repo_normalized}, langkah perbaikan yang paling disarankan sekarang:\n{fixes}"
+                )
+                return
+
+            if any(keyword in lowered for keyword in ["summary", "ringkas", "ringkasan", "jelaskan hasil", "hasil terakhir"]):
+                await update.effective_message.reply_text(
+                    f"Ini ringkasan analisis terakhir untuk {tracked_repo.repo_normalized}:\n\n{render_text_report(report)}"
+                )
+                return
+
+            if any(keyword in lowered for keyword in ["launch-ready", "launch ready", "handoff-ready", "handoff ready", "demo-safe", "demo safe", "siap launch", "siap handoff", "aman buat demo"]):
+                if report.gates:
+                    await update.effective_message.reply_text(
+                        f"Untuk {tracked_repo.repo_normalized}:\n"
+                        f"- Demo-safe: {report.gates.demo_safe}\n"
+                        f"- Launch-ready: {report.gates.launch_ready}\n"
+                        f"- Handoff-ready: {report.gates.handoff_ready}"
+                    )
+                    return
+
+            if any(keyword in lowered for keyword in ["confidence", "keyakinan", "seberapa yakin", "yakin ga"]):
+                await update.effective_message.reply_text(
+                    f"Confidence analisis terakhir untuk {tracked_repo.repo_normalized}: {report.confidence}.\nVerdict-nya: {report.verdict}"
+                )
+                return
+
+            if any(keyword in lowered for keyword in ["repo terakhir", "analisis terakhir", "repo yang terakhir dicek"]):
+                await update.effective_message.reply_text(
+                    f"Repo terakhir yang kamu cek adalah {tracked_repo.repo_normalized}.\nTracking ID: {tracked_repo.id}"
+                )
+                return
+
         if repo_url:
             await update.effective_message.reply_text(
                 "Saya lihat kamu kirim link repo GitHub.\n\n"

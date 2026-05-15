@@ -294,3 +294,71 @@ def archive_tracking(connection: Connection, *, tracked_repository_id: int) -> N
         "update followup_jobs set enabled = 0, updated_at = ? where tracked_repository_id = ?",
         (utc_now(), tracked_repository_id),
     )
+
+
+def get_latest_report_for_user(connection: Connection, *, user_id: int) -> tuple[TrackedRepositoryRecord, InspectionReportRecord] | None:
+    row = connection.execute(
+        """
+        select
+          tr.id as tr_id,
+          tr.user_id as tr_user_id,
+          tr.repo_url as tr_repo_url,
+          tr.repo_normalized as tr_repo_normalized,
+          tr.default_branch as tr_default_branch,
+          tr.status as tr_status,
+          tr.created_at as tr_created_at,
+          tr.updated_at as tr_updated_at,
+          tr.last_checked_at as tr_last_checked_at,
+          ir.id as ir_id,
+          ir.tracked_repository_id as ir_tracked_repository_id,
+          ir.trigger_kind as ir_trigger_kind,
+          ir.report_json as ir_report_json,
+          ir.stage as ir_stage,
+          ir.confidence as ir_confidence,
+          ir.verdict as ir_verdict,
+          ir.top_risks_json as ir_top_risks_json,
+          ir.top_fixes_json as ir_top_fixes_json,
+          ir.demo_safe as ir_demo_safe,
+          ir.launch_ready as ir_launch_ready,
+          ir.handoff_ready as ir_handoff_ready,
+          ir.created_at as ir_created_at
+        from tracked_repositories tr
+        join inspection_reports ir on ir.id = (
+          select id from inspection_reports where tracked_repository_id = tr.id order by id desc limit 1
+        )
+        where tr.user_id = ?
+        order by ir.id desc
+        limit 1
+        """,
+        (user_id,),
+    ).fetchone()
+    if not row:
+        return None
+
+    tracked_repo = TrackedRepositoryRecord(
+        id=row["tr_id"],
+        user_id=row["tr_user_id"],
+        repo_url=row["tr_repo_url"],
+        repo_normalized=row["tr_repo_normalized"],
+        default_branch=row["tr_default_branch"],
+        status=row["tr_status"],
+        created_at=row["tr_created_at"],
+        updated_at=row["tr_updated_at"],
+        last_checked_at=row["tr_last_checked_at"],
+    )
+    report = InspectionReportRecord(
+        id=row["ir_id"],
+        tracked_repository_id=row["ir_tracked_repository_id"],
+        trigger_kind=row["ir_trigger_kind"],
+        report_json=row["ir_report_json"],
+        stage=row["ir_stage"],
+        confidence=row["ir_confidence"],
+        verdict=row["ir_verdict"],
+        top_risks_json=row["ir_top_risks_json"],
+        top_fixes_json=row["ir_top_fixes_json"],
+        demo_safe=row["ir_demo_safe"],
+        launch_ready=row["ir_launch_ready"],
+        handoff_ready=row["ir_handoff_ready"],
+        created_at=row["ir_created_at"],
+    )
+    return tracked_repo, report

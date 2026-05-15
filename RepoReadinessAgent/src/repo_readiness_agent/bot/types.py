@@ -64,3 +64,9 @@ class InspectResult:
     tracking_id: int
     report: ProductReport
     rendered_text: str
+
+
+@dataclass
+class LatestAnalysisContext:
+    tracked_repo: TrackedRepositoryRecord
+    report: ProductReport

@@ -12,7 +12,7 @@ from ..followup import build_follow_up
 from ..formatter import render_text_report
 from . import repository as repo_db
 from .storage import Database
-from .types import InspectResult, RepoSummary, TelegramUserRecord, TrackedRepositoryRecord
+from .types import InspectResult, LatestAnalysisContext, RepoSummary, TelegramUserRecord, TrackedRepositoryRecord
 
 _GITHUB_REPO_RE = re.compile(r"^https://github\.com/(?P<owner>[A-Za-z0-9_.-]+)/(?P<repo>[A-Za-z0-9_.-]+?)(?:\.git)?/?$")
 
@@ -248,6 +248,25 @@ class RepoTrackingService:
             latest_report=inspect_result.report,
             rendered_text=render_text_report(inspect_result.report),
         )
+
+    def get_latest_analysis_for_user(
+        self,
+        *,
+        telegram_user_id: str,
+        username: str | None,
+        first_name: str | None,
+        last_name: str | None,
+    ) -> LatestAnalysisContext | None:
+        user = self._upsert_user(telegram_user_id, username, first_name, last_name)
+        with self.database.connect() as connection:
+            latest = repo_db.get_latest_report_for_user(connection, user_id=user.id)
+            if not latest:
+                return None
+            tracked_repo, report_record = latest
+            return LatestAnalysisContext(
+                tracked_repo=tracked_repo,
+                report=product_report_from_dict(json.loads(report_record.report_json)),
+            )
 
     def run_due_followups(self, *, strictness: str = "balanced") -> list[ScheduledFollowUpResult]:
         results: list[ScheduledFollowUpResult] = []
