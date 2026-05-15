@@ -144,6 +144,18 @@ def render_text_report(report: ProductReport) -> str:
     lines.append("Top 3 perbaikan:")
     lines.extend(f"- {fix}" for fix in report.top_fixes)
 
+    if report.remediation_hints:
+        lines.extend(["", "Panduan file target untuk perbaikan:"])
+        for hint in report.remediation_hints:
+            lines.append("")
+            lines.append(f"Perbaikan: {hint.fix}")
+            lines.append(f"Kenapa target ini: {hint.why}")
+            lines.append("File yang kemungkinan perlu disentuh:")
+            lines.extend(f"- {path}" for path in (hint.target_files or ["Belum ada target file yang cukup kuat dari scan saat ini."]))
+            if hint.line_hints:
+                lines.append("Line/area yang patut dicek dulu:")
+                lines.extend(f"- {item}" for item in hint.line_hints)
+
     prompts = build_fix_prompts(report)
     if prompts:
         lines.extend(["", "Prompt rekomendasi untuk memperbaiki top 3 perbaikan:"])

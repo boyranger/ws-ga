@@ -118,6 +118,9 @@ class RepoFacts:
     security_hits: int
     secret_hits: int
     entrypoint_hits: int
+    debug_examples: list[dict[str, Any]]
+    security_examples: list[dict[str, Any]]
+    secret_examples: list[dict[str, Any]]
     analyzer: AnalyzerInfo
 
 
@@ -231,6 +234,9 @@ def walk_repo(repo_path: Path, repo_label: str, branch: str | None, language_hin
     entrypoint_hits = 0
     max_file_lines = 0
     top_large_files: list[dict[str, Any]] = []
+    debug_examples: list[dict[str, Any]] = []
+    security_examples: list[dict[str, Any]] = []
+    secret_examples: list[dict[str, Any]] = []
 
     has_readme = False
     has_ci = False
@@ -307,18 +313,50 @@ def walk_repo(repo_path: Path, repo_label: str, branch: str | None, language_hin
                 top_large_files.append({"path": rel_str, "lines": line_count})
 
             if should_scan_code_patterns(path):
-                for pattern in DEBUG_PATTERNS:
-                    debug_hits += len(pattern.findall(text))
-                for pattern, _label in SECURITY_PATTERNS:
-                    security_hits += len(pattern.findall(text))
+                for line_number, line in enumerate(text.splitlines(), start=1):
+                    for pattern in DEBUG_PATTERNS:
+                        matches = pattern.findall(line)
+                        if not matches:
+                            continue
+                        debug_hits += len(matches)
+                        if len(debug_examples) < 5:
+                            debug_examples.append({
+                                "path": rel_str,
+                                "line": line_number,
+                                "label": "debug-pattern",
+                                "snippet": line.strip()[:200],
+                            })
+                    for pattern, label in SECURITY_PATTERNS:
+                        matches = pattern.findall(line)
+                        if not matches:
+                            continue
+                        security_hits += len(matches)
+                        if len(security_examples) < 5:
+                            security_examples.append({
+                                "path": rel_str,
+                                "line": line_number,
+                                "label": label,
+                                "snippet": line.strip()[:200],
+                            })
 
             if should_scan_code_patterns(path) or should_scan_config_patterns(path):
-                for pattern, _label in SECRET_PATTERNS:
-                    for match in pattern.finditer(text):
-                        snippet = match.group(0)
-                        if looks_like_placeholder_secret(snippet):
+                for line_number, line in enumerate(text.splitlines(), start=1):
+                    for pattern, label in SECRET_PATTERNS:
+                        matches = list(pattern.finditer(line))
+                        if not matches:
                             continue
-                        secret_hits += 1
+                        for match in matches:
+                            snippet = match.group(0)
+                            if looks_like_placeholder_secret(snippet):
+                                continue
+                            secret_hits += 1
+                            if len(secret_examples) < 5:
+                                secret_examples.append({
+                                    "path": rel_str,
+                                    "line": line_number,
+                                    "label": label,
+                                    "snippet": line.strip()[:200],
+                                })
 
     top_large_files = sorted(top_large_files, key=lambda item: item["lines"], reverse=True)[:10]
     dominant_language = language_hint or (language_counter.most_common(1)[0][0] if language_counter else "Unknown")
@@ -350,6 +388,9 @@ def walk_repo(repo_path: Path, repo_label: str, branch: str | None, language_hin
         security_hits=security_hits,
         secret_hits=secret_hits,
         entrypoint_hits=entrypoint_hits,
+        debug_examples=debug_examples,
+        security_examples=security_examples,
+        secret_examples=secret_examples,
         analyzer=AnalyzerInfo(name=None, applied=False, status="skipped", summary=None),
     )
 

@@ -34,12 +34,21 @@ class FollowUpStatus:
 
 
 @dataclass
+class RemediationHint:
+    fix: str
+    target_files: list[str]
+    why: str
+    line_hints: list[str]
+
+
+@dataclass
 class ProductReport:
     stage: Stage
     verdict: str
     confidence: Confidence
     top_risks: list[str]
     top_fixes: list[str]
+    remediation_hints: list[RemediationHint] | None = None
     gates: FounderGates | None = None
     follow_up: FollowUpStatus | None = None
 
@@ -55,12 +64,14 @@ def product_report_to_json(report: ProductReport) -> str:
 def product_report_from_dict(data: dict) -> ProductReport:
     gates = data.get("gates")
     follow_up = data.get("follow_up")
+    remediation_hints = data.get("remediation_hints")
     return ProductReport(
         stage=data["stage"],
         verdict=data["verdict"],
         confidence=data["confidence"],
         top_risks=data["top_risks"],
         top_fixes=data["top_fixes"],
+        remediation_hints=[RemediationHint(**item) for item in remediation_hints] if remediation_hints else None,
         gates=FounderGates(**gates) if gates else None,
         follow_up=FollowUpStatus(**follow_up) if follow_up else None,
     )

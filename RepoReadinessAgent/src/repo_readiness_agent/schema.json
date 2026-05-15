@@ -33,6 +33,31 @@
       "type": "array",
       "items": { "type": "string" }
     },
+    "remediation_hints": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["fix", "target_files", "why", "line_hints"],
+            "properties": {
+              "fix": { "type": "string" },
+              "target_files": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "why": { "type": "string" },
+              "line_hints": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        },
+        { "type": "null" }
+      ]
+    },
     "gates": {
       "anyOf": [
         {
