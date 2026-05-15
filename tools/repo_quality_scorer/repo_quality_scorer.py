@@ -31,12 +31,14 @@ CODE_SCAN_EXTENSIONS = {
 CONFIG_SCAN_EXTENSIONS = {".json", ".yaml", ".yml", ".toml", ".ini", ".cfg", ".env"}
 PLACEHOLDER_SECRET_MARKERS = (
     "change_me",
+    "changethis",
     "example",
     "your_",
     "placeholder",
     "dummy",
     "sample",
     "test",
+    "${{ secrets.",
     "<api_key>",
     "<token>",
     "<secret>",

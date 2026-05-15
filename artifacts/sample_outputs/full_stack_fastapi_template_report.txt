@@ -1,0 +1,63 @@
+Repo: https://github.com/tiangolo/full-stack-fastapi-template
+
+Stage: MVP
+Verdict: This repository looks usable for demos or early users, but it still needs focused hardening before handoff.
+Confidence: High
+Demo-safe? yes
+Launch-ready? not yet
+Handoff-ready? not yet
+
+Code Quality Score: 5.9 / 10
+Production Readiness Score: 7.5 / 10
+
+Top risks:
+- At least one very large file was detected, which may indicate concentrated complexity.
+- No environment example/template was found, which weakens onboarding and config discipline.
+
+Top 3 fixes:
+1. Split oversized files/functions into smaller units with clearer boundaries.
+2. Add a .env.example or equivalent config template.
+
+Signal breakdown:
+- Architecture: 5.7
+- Code quality: 4.6
+- Security: 5.9
+- Testing: 7.3
+- Documentation: 7.6
+- Production readiness: 8.7
+
+Strengths:
+- README exists, so the repository has at least a basic documentation entrypoint.
+- Repository includes tests (29 detected test files).
+- CI workflow files were detected, which improves delivery discipline.
+- Deployment/containerization hints exist via Docker-related files.
+- Schema or migration-related files were found, suggesting some persistence discipline.
+
+Red flags:
+- None noted.
+
+Follow-up status options:
+- Improved
+- Unchanged
+- Still blocked
+
+Monitoring stop conditions:
+- Target reached
+- Keep monitoring
+
+Inputs:
+- Strictness: balanced
+- Branch: default
+- Subdir: /
+- Language hint: auto
+
+Facts:
+- Dominant language: TypeScript
+- Source files: 180
+- Test files: 29
+- Has CI: True
+- Has Docker: True
+- Has env example: False
+- Has migrations: True
+- Largest file lines: 861
+- Backbone analyzer: warn

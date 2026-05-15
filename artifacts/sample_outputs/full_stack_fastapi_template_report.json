@@ -1,0 +1,136 @@
+{
+  "schema_version": "1.1.0",
+  "repo": "https://github.com/tiangolo/full-stack-fastapi-template",
+  "local_path": "/tmp/repo-quality-bhrq_ti0",
+  "confidence": "High",
+  "verdict": "This repository looks usable for demos or early users, but it still needs focused hardening before handoff.",
+  "maturity_level": "MVP",
+  "code_quality_score": 5.9,
+  "production_readiness_score": 7.5,
+  "founder_gates": {
+    "demo_safe": "yes",
+    "launch_ready": "not yet",
+    "handoff_ready": "not yet"
+  },
+  "follow_up_status_options": [
+    "Improved",
+    "Unchanged",
+    "Still blocked"
+  ],
+  "monitoring_stop_conditions": [
+    "Target reached",
+    "Keep monitoring"
+  ],
+  "breakdown": {
+    "architecture": 5.7,
+    "code_quality": 4.6,
+    "security": 5.9,
+    "testing": 7.3,
+    "documentation": 7.6,
+    "production_readiness": 8.7
+  },
+  "strengths": [
+    "README exists, so the repository has at least a basic documentation entrypoint.",
+    "Repository includes tests (29 detected test files).",
+    "CI workflow files were detected, which improves delivery discipline.",
+    "Deployment/containerization hints exist via Docker-related files.",
+    "Schema or migration-related files were found, suggesting some persistence discipline."
+  ],
+  "risks": [
+    "At least one very large file was detected, which may indicate concentrated complexity.",
+    "No environment example/template was found, which weakens onboarding and config discipline."
+  ],
+  "red_flags": [],
+  "top_improvements": [
+    "Split oversized files/functions into smaller units with clearer boundaries.",
+    "Add a .env.example or equivalent config template."
+  ],
+  "inputs": {
+    "repo": "https://github.com/tiangolo/full-stack-fastapi-template",
+    "branch": null,
+    "subdir": null,
+    "strictness": "balanced",
+    "language_hint": null,
+    "output_format": "json"
+  },
+  "facts": {
+    "repo": "https://github.com/tiangolo/full-stack-fastapi-template",
+    "local_path": "/tmp/repo-quality-bhrq_ti0",
+    "branch": null,
+    "files_total": 228,
+    "source_files": 180,
+    "test_files": 29,
+    "doc_files": 12,
+    "has_readme": true,
+    "has_ci": true,
+    "has_docker": true,
+    "has_env_example": false,
+    "has_migrations": true,
+    "has_healthcheck": false,
+    "has_lockfile": true,
+    "has_tests": true,
+    "has_package_json": true,
+    "has_pyproject": true,
+    "has_go_mod": false,
+    "dominant_language": "TypeScript",
+    "languages": {
+      "Python": 47,
+      "TypeScript": 95
+    },
+    "max_file_lines": 861,
+    "top_large_files": [
+      {
+        "path": "release-notes.md",
+        "lines": 861
+      },
+      {
+        "path": "frontend/src/components/ui/sidebar.tsx",
+        "lines": 738
+      },
+      {
+        "path": "frontend/src/client/schemas.gen.ts",
+        "lines": 559
+      },
+      {
+        "path": "backend/tests/api/routes/test_users.py",
+        "lines": 522
+      },
+      {
+        "path": "frontend/src/client/sdk.gen.ts",
+        "lines": 468
+      },
+      {
+        "path": "frontend/src/client/core/request.ts",
+        "lines": 347
+      },
+      {
+        "path": "deployment.md",
+        "lines": 345
+      },
+      {
+        "path": "frontend/src/components/ui/dropdown-menu.tsx",
+        "lines": 258
+      },
+      {
+        "path": "frontend/tests/user-settings.spec.ts",
+        "lines": 257
+      }
+    ],
+    "debug_hits": 5,
+    "security_hits": 0,
+    "secret_hits": 0,
+    "entrypoint_hits": 10,
+    "analyzer": {
+      "name": "code-quality-check",
+      "applied": true,
+      "status": "warn",
+      "summary": "\u001b[2m  [TOLERABLE] 🌱 Function growing: 15 logic lines \"findEmail\" | frontend/tests/utils/mailcatcher.ts:9\u001b[0m\n\u001b[2m  [TOLERABLE] 🌱 Function growing: 22 logic lines \"findLastEmail\" | frontend/tests/utils/mailcatcher.ts:33\u001b[0m\n\u001b[2m  [TOLERABLE] 🌱 Function growing: 15 logic lines \"createUser\" | frontend/tests/utils/privateApi.ts:7\u001b[0m\n\u001b[33m  [BLOATED] ☢️ Critical Sandi Metz violations detected. Architecturally heavy.\u001b[0m\n\n\u001b[1m🔴 Category 23: Security Vulnerabilities (AI Slop Risk)\u001b[0m\n\u001b[33m  ⚠  Security warning [Sensitive data in localStorage] at frontend/src/hooks/useAuth.ts:45\u001b[0m\n\u001b[33m  ⚠  Security warning [Sensitive data in localStorage] at frontend/tests/login.spec.ts:112\u001b[0m\n\u001b[33m  ⚠  Security warning [Secret in URL query string] at frontend/tests/reset-password.spec.ts:57\u001b[0m\n\u001b[33m  ⚠  Security warning [Secret in URL query string] at frontend/tests/reset-password.spec.ts:78\u001b[0m\n\u001b[33m  ⚠  Security warning [Secret in URL query string] at frontend/tests/reset-password.spec.ts:112\u001b[0m\n\n\u001b[1m🔴 Category 24: Functional Purity & Immutability\u001b[0m\n\u001b[33m  ⚠  Array Mutation (.push) at frontend/src/client/core/CancelablePromise.ts:64\u001b[0m\n\u001b[2m     ↳ Use immutable spread operator [...array, item] or .flatMap() for performant single-pass transformations instead of .push()\u001b[0m\n\u001b[2m     → this.cancelHandlers.push(cancelHandler);\u001b[0m\n\u001b[33m  ⚠  Array Mutation (.push) at frontend/src/client/core/request.ts:44\u001b[0m\n\u001b[2m     ↳ Use immutable spread operator [...array, item] or .flatMap() for performant single-pass transformations instead of .push()\u001b[0m\n\u001b[2m     → qs.push(`${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`);\u001b[0m\n\u001b[33m  ⚠  Object Mutation (delete) at frontend/src/components/Admin/EditUser.tsx:94\u001b[0m\n\u001b[2m     ↳ Return a new object without the key using destructing instead of `delete`\u001b[0m\n\u001b[2m     → delete submitData.password\u001b[0m\n\n\u001b[1m🔴 Category 25: Formatting Noise\u001b[0m\n\u001b[32m  ✔ Diff is small (0 lines) — formatting noise check skipped.\u001b[0m\n\n\u001b[36m=== Pillar 4: Unused Detection ===\u001b[0m\n\u001b[2m     Running comprehensive unused scan via knip...\u001b[0m\n\u001b[33m  ⚠  Knip found dead code or unused files. Check output:\u001b[0m\n\u001b[2m     file:///home/ubuntu/.npm/_npx/8d873e0e769cf1b4/node_modules/oxc-parser/src-js/raw-transfer/common.js:276\n  const arrayBuffer = new ArrayBuffer(ARRAY_BUFFER_SIZE);\n                      ^\n\nRangeError: Array buffer allocation failed\n    at new ArrayBuffer (<anonymous>)\n    at createBuffer (file:///home/ubuntu/.npm/_npx/8d873e0e769cf1b4/node_modules/oxc-parser/src-js/raw-transfer/common.js:276:23)\n    at prepareRaw (file:///home/ubuntu/.npm/_npx/8d873e0e769cf1b4/node_modules/oxc-parser/src-js/raw-transfer/common.js:201:55)\n    at parseSyncRawImpl (file:///home/ubuntu/.npm/_npx/8d873e0e769cf1b4/node_modules/oxc-parser/src-js/raw-transfer/common.js:36:37)\n    at parseSyncRaw (file:///home/ubuntu/.npm/_npx/8d873e0e769cf1b4/node_modules/oxc-parser/src-js/raw-transfer/eager.js:16:10)\n    at parseSync (file:///home/ubuntu/.npm/_npx/8d873e0e769cf1b4/node_modules/oxc-parser/src-js/index.js:60:12)\n    at parseFile (file:///home/ubuntu/.npm/_npx/8d873e0e769cf1b4/node_modules/knip/dist/typescript/ast-nodes.js:13:12)\n    at runPlugin (file:///home/ubuntu/.npm/_npx/8d873e0e769cf1b4/node_modules/knip/dist/WorkspaceWorker.js:313:47)\n    at async WorkspaceWorker.runPlugins (file:///home/ubuntu/.npm/_npx/8d873e0e769cf1b4/node_modules/knip/dist/WorkspaceWorker.js:390:33)\n    at async build (file:///home/ubuntu/.npm/_npx/8d873e0e769cf1b4/node_modules/knip/dist/graph/build.js:134:35)\n\nNode.js v22.22.2\u001b[0m\n\n\u001b[1m📊 Slop Summary:\u001b[0m\n\u001b[31m  🔴 Red Issues (Must Be Fix): 5\u001b[0m\n\u001b[33m  🟡 Yellow Issues (Recommend to handle with human observation): 76\u001b[0m\n\u001b[2m  🏛️ Architectural Debt (Informational): 47\u001b[0m\n\u001b[2m     - God Functions: 5\n     - Bloated Methods: 12\n     - Tolerable Debt: 30\u001b[0m\n\n\u001b[31m\u001b[1m  ✘ CRITICAL: MUST BE FIX. Red issues are blocking. Read /tmp/repo-quality-bhrq_ti0/ai-slop-result.md\u001b[0m\n\n\u001b[31m[Code Quality] Pillar 1/4 failed.\u001b[0m\n",
+      "exit_code": 1,
+      "signals": {
+        "failed_mentions": 2,
+        "warn_mentions": 8,
+        "pass_mentions": 21
+      }
+    }
+  }
+}
