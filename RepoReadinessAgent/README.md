@@ -135,6 +135,43 @@ RepoReadinessAgent/
 
 ---
 
+## Installation
+
+### Requirements
+
+Recommended local environment:
+- Python 3.11+
+- `git`
+- internet access for cloning and inspecting public GitHub repositories
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/boyranger/ws-ga.git
+cd ws-ga/RepoReadinessAgent
+```
+
+### 2. Create a virtual environment
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+### 3. Install dependencies
+
+```bash
+pip install --upgrade pip
+pip install -r requirements-bot.txt
+```
+
+This installs the runtime dependencies for:
+- CLI inspection
+- Telegram bot surface
+- PDF export
+
+---
+
 ## Quick start
 
 ### 1. Inspect a repository
@@ -142,19 +179,19 @@ RepoReadinessAgent/
 From `RepoReadinessAgent/`:
 
 ```bash
-PYTHONPATH=src python3 -m repo_readiness_agent.cli inspect https://github.com/pallets/flask --format text
+PYTHONPATH=src .venv/bin/python -m repo_readiness_agent.cli inspect https://github.com/pallets/flask --format text
 ```
 
 ### 2. Get JSON output
 
 ```bash
-PYTHONPATH=src python3 -m repo_readiness_agent.cli inspect https://github.com/pallets/flask --format json
+PYTHONPATH=src .venv/bin/python -m repo_readiness_agent.cli inspect https://github.com/pallets/flask --format json
 ```
 
 ### 3. Export hasil ke PDF bahasa Indonesia
 
 ```bash
-PYTHONPATH=src python3 -m repo_readiness_agent.cli inspect \
+PYTHONPATH=src .venv/bin/python -m repo_readiness_agent.cli inspect \
   https://github.com/pallets/flask \
   --format pdf \
   --output examples/sample_outputs/flask_product_report_id.pdf
@@ -163,7 +200,7 @@ PYTHONPATH=src python3 -m repo_readiness_agent.cli inspect \
 ### 4. Run follow-up comparison
 
 ```bash
-PYTHONPATH=src python3 -m repo_readiness_agent.cli followup \
+PYTHONPATH=src .venv/bin/python -m repo_readiness_agent.cli followup \
   examples/sample_outputs/qris_payment_bot_followup_before.json \
   examples/sample_outputs/qris_payment_bot_followup_after.json \
   --format text
@@ -236,12 +273,25 @@ This keeps the architecture split clean:
 
 ---
 
-## Optional Telegram bot scaffold
+## Telegram bot
 
-The repository also contains an early Telegram bot scaffold for public interaction experiments.
+Repo Readiness Agent also ships with a Telegram bot surface for founder-facing usage.
 
-Example commands:
+### Live bot
+
+You can try the live bot at:
+- `@repoReadinessBot`
+
+Current intended usage flow:
+1. send `/start`
+2. send a GitHub repo URL or use `/inspect <github_url>`
+3. ask follow-up questions naturally
+4. optionally track the repo for later follow-up
+
+### Example commands
+
 - `/start`
+- `/help`
 - `/inspect <github_url>`
 - `/track <github_url>`
 - `/myrepos`
@@ -249,15 +299,44 @@ Example commands:
 - `/followup <tracking_id>`
 - `/untrack <tracking_id>`
 
-Local run references:
+### Natural language examples
+
+- `cek repo ini https://github.com/pallets/flask`
+- `apa risiko utamanya?`
+- `beri prompt perbaikannya`
+- `relay buat solo founder`
+- `cek lagi repo yang tadi`
+
+### Run the bot locally
+
+1. Copy the example environment file:
 
 ```bash
-pip install -r requirements-bot.txt
-REPO_READINESS_TELEGRAM_BOT_TOKEN=... PYTHONPATH=src python3 -m repo_readiness_agent.bot.app
-PYTHONPATH=src python3 -m repo_readiness_agent.bot.runner
+cp .env.example .env
+```
 
-# export PDF founder-facing
-PYTHONPATH=src python3 -m repo_readiness_agent.cli inspect <github_url> --format pdf --output report.pdf
+2. Set your Telegram token inside `.env` or export it directly:
+
+```bash
+export REPO_READINESS_TELEGRAM_BOT_TOKEN=your_bot_token_here
+```
+
+3. Start the bot:
+
+```bash
+PYTHONPATH=src .venv/bin/python -m repo_readiness_agent.bot.app
+```
+
+4. Run the scheduled follow-up runner manually:
+
+```bash
+PYTHONPATH=src .venv/bin/python -m repo_readiness_agent.bot.runner
+```
+
+5. Export PDF founder-facing output when needed:
+
+```bash
+PYTHONPATH=src .venv/bin/python -m repo_readiness_agent.cli inspect <github_url> --format pdf --output report.pdf
 ```
 
 Use `.env.example` and `docs/public_telegram_bot_runbook.md` for local setup.
@@ -293,6 +372,7 @@ Do not commit real secrets.
 Current limitations to be transparent about:
 - scoring heuristics are still conservative in some cases
 - some supporting analyzers may have environment-specific caveats
+- autonomous follow-up is strong for hackathon/demo use, but still intentionally lightweight
 - the product is stronger as a hackathon-ready decision tool than as a fully hardened production SaaS
 
 That is acceptable for the current scope as long as the demo stays focused, coherent, and evidence-based.
