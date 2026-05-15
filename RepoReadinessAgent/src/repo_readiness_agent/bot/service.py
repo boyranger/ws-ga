@@ -12,7 +12,7 @@ from ..followup import build_follow_up
 from ..formatter import render_text_report
 from . import repository as repo_db
 from .storage import Database
-from .types import InspectResult, LatestAnalysisContext, RepoSummary, TelegramUserRecord, TrackedRepositoryRecord
+from .types import ConversationState, InspectResult, LatestAnalysisContext, RepoSummary, TelegramUserRecord, TrackedRepositoryRecord
 
 _GITHUB_REPO_RE = re.compile(r"^https://github\.com/(?P<owner>[A-Za-z0-9_.-]+)/(?P<repo>[A-Za-z0-9_.-]+?)(?:\.git)?/?$")
 
@@ -105,13 +105,23 @@ class RepoTrackingService:
                 repo_normalized=normalized,
                 default_branch=branch,
             )
-            repo_db.insert_report(
+            report_record = repo_db.insert_report(
                 connection,
                 tracked_repository_id=tracked_repo.id,
                 trigger_kind=trigger_kind,
                 report=product_report,
             )
             repo_db.touch_tracked_repo(connection, tracked_repo.id)
+            repo_db.upsert_conversation_state(
+                connection,
+                telegram_user_id=telegram_user_id,
+                active_tracking_id=tracked_repo.id,
+                active_repo_url=tracked_repo.repo_normalized,
+                last_report_id=report_record.id,
+                last_user_goal="inspect_repo",
+                last_agent_action=trigger_kind,
+                conversation_summary=f"User terakhir menginspeksi {tracked_repo.repo_normalized}.",
+            )
             connection.commit()
 
         rendered = render_text_report(product_report)
@@ -157,6 +167,15 @@ class RepoTrackingService:
                 target_stage=target_stage,
                 target_confidence=target_confidence,
                 enabled=True,
+            )
+            repo_db.upsert_conversation_state(
+                connection,
+                telegram_user_id=telegram_user_id,
+                active_tracking_id=tracked_repo.id,
+                active_repo_url=tracked_repo.repo_normalized,
+                last_user_goal="track_repo",
+                last_agent_action="enable_tracking",
+                conversation_summary=f"User sedang memantau {tracked_repo.repo_normalized}.",
             )
             connection.commit()
             return tracked_repo
@@ -263,6 +282,17 @@ class RepoTrackingService:
             if not latest:
                 return None
             tracked_repo, report_record = latest
+            repo_db.upsert_conversation_state(
+                connection,
+                telegram_user_id=telegram_user_id,
+                active_tracking_id=tracked_repo.id,
+                active_repo_url=tracked_repo.repo_normalized,
+                last_report_id=report_record.id,
+                last_user_goal="discuss_latest_analysis",
+                last_agent_action="load_latest_analysis",
+                conversation_summary=f"Konteks aktif saat ini adalah {tracked_repo.repo_normalized}.",
+            )
+            connection.commit()
             return LatestAnalysisContext(
                 tracked_repo=tracked_repo,
                 report=product_report_from_dict(json.loads(report_record.report_json)),
@@ -314,3 +344,15 @@ class RepoTrackingService:
             )
 
         return results
+
+    def get_conversation_state(
+        self,
+        *,
+        telegram_user_id: str,
+        username: str | None,
+        first_name: str | None,
+        last_name: str | None,
+    ) -> ConversationState | None:
+        self._upsert_user(telegram_user_id, username, first_name, last_name)
+        with self.database.connect() as connection:
+            return repo_db.get_conversation_state(connection, telegram_user_id=telegram_user_id)

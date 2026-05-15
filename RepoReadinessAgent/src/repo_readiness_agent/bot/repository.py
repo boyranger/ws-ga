@@ -7,7 +7,7 @@ from datetime import UTC, datetime, timedelta
 from sqlite3 import Connection, Row
 
 from ..contract import ProductReport, product_report_to_json
-from .types import InspectionReportRecord, RepoSummary, TelegramUserRecord, TrackedRepositoryRecord
+from .types import ConversationState, InspectionReportRecord, RepoSummary, TelegramUserRecord, TrackedRepositoryRecord
 
 
 def utc_now() -> str:
@@ -31,6 +31,10 @@ def _row_to_repo(row: Row) -> TrackedRepositoryRecord:
 
 def _row_to_report(row: Row) -> InspectionReportRecord:
     return InspectionReportRecord(**dict(row))
+
+
+def _row_to_conversation_state(row: Row) -> ConversationState:
+    return ConversationState(**dict(row))
 
 
 def upsert_telegram_user(
@@ -294,6 +298,60 @@ def archive_tracking(connection: Connection, *, tracked_repository_id: int) -> N
         "update followup_jobs set enabled = 0, updated_at = ? where tracked_repository_id = ?",
         (utc_now(), tracked_repository_id),
     )
+
+
+def upsert_conversation_state(
+    connection: Connection,
+    *,
+    telegram_user_id: str,
+    active_tracking_id: int | None = None,
+    active_repo_url: str | None = None,
+    last_report_id: int | None = None,
+    last_user_goal: str | None = None,
+    last_agent_action: str | None = None,
+    conversation_summary: str | None = None,
+) -> ConversationState:
+    now = utc_now()
+    connection.execute(
+        """
+        insert into conversation_state (
+          telegram_user_id, active_tracking_id, active_repo_url, last_report_id,
+          last_user_goal, last_agent_action, conversation_summary, updated_at
+        ) values (?, ?, ?, ?, ?, ?, ?, ?)
+        on conflict(telegram_user_id) do update set
+          active_tracking_id=coalesce(excluded.active_tracking_id, conversation_state.active_tracking_id),
+          active_repo_url=coalesce(excluded.active_repo_url, conversation_state.active_repo_url),
+          last_report_id=coalesce(excluded.last_report_id, conversation_state.last_report_id),
+          last_user_goal=coalesce(excluded.last_user_goal, conversation_state.last_user_goal),
+          last_agent_action=coalesce(excluded.last_agent_action, conversation_state.last_agent_action),
+          conversation_summary=coalesce(excluded.conversation_summary, conversation_state.conversation_summary),
+          updated_at=excluded.updated_at
+        """,
+        (
+            telegram_user_id,
+            active_tracking_id,
+            active_repo_url,
+            last_report_id,
+            last_user_goal,
+            last_agent_action,
+            conversation_summary,
+            now,
+        ),
+    )
+    row = connection.execute(
+        "select * from conversation_state where telegram_user_id = ?",
+        (telegram_user_id,),
+    ).fetchone()
+    assert row is not None
+    return _row_to_conversation_state(row)
+
+
+def get_conversation_state(connection: Connection, *, telegram_user_id: str) -> ConversationState | None:
+    row = connection.execute(
+        "select * from conversation_state where telegram_user_id = ?",
+        (telegram_user_id,),
+    ).fetchone()
+    return _row_to_conversation_state(row) if row else None
 
 
 def get_latest_report_for_user(connection: Connection, *, user_id: int) -> tuple[TrackedRepositoryRecord, InspectionReportRecord] | None:

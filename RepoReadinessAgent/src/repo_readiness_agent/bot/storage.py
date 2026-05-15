@@ -62,6 +62,17 @@ create table if not exists followup_jobs (
   updated_at text not null,
   foreign key(tracked_repository_id) references tracked_repositories(id)
 );
+
+create table if not exists conversation_state (
+  telegram_user_id text primary key,
+  active_tracking_id integer,
+  active_repo_url text,
+  last_report_id integer,
+  last_user_goal text,
+  last_agent_action text,
+  conversation_summary text,
+  updated_at text not null
+);
 """
 
 

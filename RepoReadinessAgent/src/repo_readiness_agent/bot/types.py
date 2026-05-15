@@ -70,3 +70,15 @@ class InspectResult:
 class LatestAnalysisContext:
     tracked_repo: TrackedRepositoryRecord
     report: ProductReport
+
+
+@dataclass
+class ConversationState:
+    telegram_user_id: str
+    active_tracking_id: int | None
+    active_repo_url: str | None
+    last_report_id: int | None
+    last_user_goal: str | None
+    last_agent_action: str | None
+    conversation_summary: str | None
+    updated_at: str
