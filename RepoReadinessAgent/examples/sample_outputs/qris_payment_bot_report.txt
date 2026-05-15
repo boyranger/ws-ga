@@ -1,0 +1,14 @@
+Stage: MVP
+Verdict: Usable foundation, though several quality or operational gaps still need attention.
+Confidence: Medium
+
+Top risks:
+- No CI workflow was detected, so quality gates may rely on manual discipline.
+
+Top 3 fixes:
+- Add CI to run lint/typecheck/tests on every change.
+
+Founder gates:
+- Demo-safe? yes
+- Launch-ready? not yet
+- Handoff-ready? not yet

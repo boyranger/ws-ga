@@ -52,9 +52,16 @@ The current implementation backbone lives in `tools/repo_quality_scorer/`, while
 - `docs/hackathon_submission.md`
 - `docs/repo_quality_scorer_hackathon_positioning.md`
 
-## Initial source skeleton
+## Product-layer implementation status
 
+The product layer now has a working CLI adapter on top of the scorer engine.
+
+Current product-layer modules:
 - `src/repo_readiness_agent/contract.py` - product-facing report structures
+- `src/repo_readiness_agent/engine.py` - adapter from scorer output into founder-facing product output
 - `src/repo_readiness_agent/formatter.py` - text rendering helpers
 - `src/repo_readiness_agent/followup.py` - follow-up status and stop-condition concepts
-- `src/repo_readiness_agent/cli.py` - future product-layer CLI entrypoint
+- `src/repo_readiness_agent/cli.py` - product-layer CLI entrypoint
+
+Example run:
+- `PYTHONPATH=src python3 -m repo_readiness_agent.cli https://github.com/owner/repo`
