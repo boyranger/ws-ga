@@ -88,6 +88,22 @@ The agent:
    - top risks
    - top fixes
 
+### Preferred 4-phase product loop
+
+To keep the product easy to explain, the agent should be framed as a compact end-to-end loop:
+
+1. **Repo Intake**
+   - accept the GitHub URL
+   - clone or access the repository
+2. **Signal Inspection**
+   - inspect structure, docs, tests, config, and delivery signals
+3. **Readiness Judgment**
+   - classify the repo as Prototype, MVP, or Handoff-ready
+4. **Founder Guidance**
+   - return the verdict, top risks, and the next fixes that matter most
+
+This phase framing is intentionally small. It gives the product a stronger autonomous shape without turning it into a sprawling multi-stage platform.
+
 ---
 
 ## Solution statement
@@ -147,6 +163,18 @@ Every visible report should try to answer these questions clearly:
 2. Can I demo, launch, or hand this off yet?
 3. What are the top risks?
 4. What are the next 3 fixes that matter most?
+
+### Preferred founder-facing gates
+
+The report should feel like a founder decision artifact, not just a technical scan.
+
+Preferred visible gates:
+- **Demo-safe?** yes / not yet
+- **Launch-ready?** yes / not yet
+- **Handoff-ready?** yes / not yet
+- **Confidence:** Low / Medium / High
+
+These gates do not replace the maturity stage. They enrich it by making the output easier to act on.
 
 ### Preferred stage labels for hackathon scope
 
