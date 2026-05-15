@@ -5,7 +5,15 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from .handlers import inspect_handler, myrepos_handler, report_handler, start_handler
+from .handlers import (
+    followup_handler,
+    inspect_handler,
+    myrepos_handler,
+    report_handler,
+    start_handler,
+    track_handler,
+    untrack_handler,
+)
 from .service import RepoTrackingService
 from .storage import Database
 
@@ -34,8 +42,11 @@ def main() -> None:
 
     application.add_handler(CommandHandler("start", start_handler))
     application.add_handler(CommandHandler("inspect", inspect_handler))
+    application.add_handler(CommandHandler("track", track_handler))
     application.add_handler(CommandHandler("myrepos", myrepos_handler))
     application.add_handler(CommandHandler("report", report_handler))
+    application.add_handler(CommandHandler("followup", followup_handler))
+    application.add_handler(CommandHandler("untrack", untrack_handler))
 
     application.run_polling()
 

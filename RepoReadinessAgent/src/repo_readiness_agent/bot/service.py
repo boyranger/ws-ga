@@ -2,17 +2,36 @@
 
 from __future__ import annotations
 
-import re
 import json
+import re
+from dataclasses import dataclass
 
 from ..contract import ProductReport, product_report_from_dict
 from ..engine import build_product_report, run_engine
+from ..followup import build_follow_up
 from ..formatter import render_text_report
 from . import repository as repo_db
 from .storage import Database
 from .types import InspectResult, RepoSummary, TelegramUserRecord, TrackedRepositoryRecord
 
 _GITHUB_REPO_RE = re.compile(r"^https://github\.com/(?P<owner>[A-Za-z0-9_.-]+)/(?P<repo>[A-Za-z0-9_.-]+?)(?:\.git)?/?$")
+
+
+@dataclass
+class FollowUpRunResult:
+    tracked_repo: TrackedRepositoryRecord
+    previous_report: ProductReport
+    latest_report: ProductReport
+    rendered_text: str
+
+
+@dataclass
+class ScheduledFollowUpResult:
+    telegram_user_id: str
+    tracking_id: int
+    repo_url: str
+    report: ProductReport
+    rendered_text: str
 
 
 class ServiceError(Exception):
@@ -180,3 +199,99 @@ class RepoTrackingService:
             if not latest:
                 raise NotFoundError("No report has been saved for that tracking record yet.")
             return tracked_repo, product_report_from_dict(json.loads(latest.report_json))
+
+    def run_followup_for_tracking(
+        self,
+        *,
+        telegram_user_id: str,
+        username: str | None,
+        first_name: str | None,
+        last_name: str | None,
+        tracking_id: int,
+        strictness: str = "balanced",
+        language_hint: str | None = None,
+    ) -> FollowUpRunResult:
+        user = self._upsert_user(telegram_user_id, username, first_name, last_name)
+        with self.database.connect() as connection:
+            tracked_repo = repo_db.get_tracked_repo_for_user(connection, user_id=user.id, tracking_id=tracking_id)
+            if not tracked_repo:
+                raise NotFoundError("Tracking record not found.")
+            latest_record = repo_db.get_latest_report_for_repo(connection, tracked_repository_id=tracked_repo.id)
+            if not latest_record:
+                raise NotFoundError("No previous report exists yet. Use /inspect first.")
+            previous_report = product_report_from_dict(json.loads(latest_record.report_json))
+
+        inspect_result = self.inspect_repo(
+            telegram_user_id=telegram_user_id,
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            repo_url=tracked_repo.repo_normalized,
+            branch=tracked_repo.default_branch,
+            strictness=strictness,
+            language_hint=language_hint,
+            trigger_kind="manual_followup",
+        )
+        inspect_result.report.follow_up = build_follow_up(previous_report, inspect_result.report)
+
+        with self.database.connect() as connection:
+            repo_db.replace_latest_report_payload(
+                connection,
+                tracked_repository_id=tracked_repo.id,
+                report=inspect_result.report,
+            )
+            connection.commit()
+
+        return FollowUpRunResult(
+            tracked_repo=tracked_repo,
+            previous_report=previous_report,
+            latest_report=inspect_result.report,
+            rendered_text=render_text_report(inspect_result.report),
+        )
+
+    def run_due_followups(self, *, strictness: str = "balanced") -> list[ScheduledFollowUpResult]:
+        results: list[ScheduledFollowUpResult] = []
+        with self.database.connect() as connection:
+            due_jobs = repo_db.list_due_followup_jobs(connection)
+
+        for job in due_jobs:
+            previous_report = product_report_from_dict(json.loads(job["report_json"]))
+            inspect_result = self.inspect_repo(
+                telegram_user_id=job["telegram_user_id"],
+                username=job["username"],
+                first_name=job["first_name"],
+                last_name=job["last_name"],
+                repo_url=job["repo_normalized"],
+                branch=job["default_branch"],
+                strictness=strictness,
+                trigger_kind="scheduled_followup",
+            )
+            inspect_result.report.follow_up = build_follow_up(
+                previous_report,
+                inspect_result.report,
+                target_stage=job["target_stage"],
+                target_confidence=job["target_confidence"],
+            )
+            with self.database.connect() as connection:
+                repo_db.replace_latest_report_payload(
+                    connection,
+                    tracked_repository_id=job["tracked_repository_id"],
+                    report=inspect_result.report,
+                )
+                repo_db.mark_followup_job_run(
+                    connection,
+                    tracked_repository_id=job["tracked_repository_id"],
+                    stop_reached=inspect_result.report.follow_up.stop_condition == "Target reached",
+                )
+                connection.commit()
+            results.append(
+                ScheduledFollowUpResult(
+                    telegram_user_id=job["telegram_user_id"],
+                    tracking_id=job["tracked_repository_id"],
+                    repo_url=job["repo_normalized"],
+                    report=inspect_result.report,
+                    rendered_text=render_text_report(inspect_result.report),
+                )
+            )
+
+        return results

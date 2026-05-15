@@ -50,6 +50,30 @@ async def inspect_handler(update: Any, context: Any) -> None:
         await update.effective_message.reply_text(f"Inspection failed: {exc}")
 
 
+async def track_handler(update: Any, context: Any) -> None:
+    user_id, username, first_name, last_name = _telegram_user_parts(update)
+    service: RepoTrackingService = context.application.bot_data["repo_tracking_service"]
+    if not context.args:
+        await update.effective_message.reply_text("Usage: /track https://github.com/owner/repo")
+        return
+    repo_url = context.args[0]
+    try:
+        tracked = service.enable_tracking(
+            telegram_user_id=user_id,
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            repo_url=repo_url,
+        )
+        await update.effective_message.reply_text(
+            f"Tracking enabled.\nTracking ID: {tracked.id}\nRepo: {tracked.repo_normalized}"
+        )
+    except ValidationError as exc:
+        await update.effective_message.reply_text(str(exc))
+    except Exception as exc:
+        await update.effective_message.reply_text(f"Could not enable tracking: {exc}")
+
+
 async def myrepos_handler(update: Any, context: Any) -> None:
     user_id, username, first_name, last_name = _telegram_user_parts(update)
     service: RepoTrackingService = context.application.bot_data["repo_tracking_service"]
@@ -95,3 +119,59 @@ async def report_handler(update: Any, context: Any) -> None:
         await update.effective_message.reply_text(str(exc))
     except Exception as exc:
         await update.effective_message.reply_text(f"Could not load report: {exc}")
+
+
+async def followup_handler(update: Any, context: Any) -> None:
+    user_id, username, first_name, last_name = _telegram_user_parts(update)
+    service: RepoTrackingService = context.application.bot_data["repo_tracking_service"]
+    if not context.args:
+        await update.effective_message.reply_text("Usage: /followup <tracking_id>")
+        return
+    try:
+        tracking_id = int(context.args[0])
+    except ValueError:
+        await update.effective_message.reply_text("Tracking ID must be a number.")
+        return
+    try:
+        result = service.run_followup_for_tracking(
+            telegram_user_id=user_id,
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            tracking_id=tracking_id,
+        )
+        await update.effective_message.reply_text(
+            f"Tracking ID: {result.tracked_repo.id}\nRepo: {result.tracked_repo.repo_normalized}\n\n{result.rendered_text}"
+        )
+    except (ValidationError, NotFoundError) as exc:
+        await update.effective_message.reply_text(str(exc))
+    except Exception as exc:
+        await update.effective_message.reply_text(f"Could not run follow-up: {exc}")
+
+
+async def untrack_handler(update: Any, context: Any) -> None:
+    user_id, username, first_name, last_name = _telegram_user_parts(update)
+    service: RepoTrackingService = context.application.bot_data["repo_tracking_service"]
+    if not context.args:
+        await update.effective_message.reply_text("Usage: /untrack <tracking_id>")
+        return
+    try:
+        tracking_id = int(context.args[0])
+    except ValueError:
+        await update.effective_message.reply_text("Tracking ID must be a number.")
+        return
+    try:
+        tracked = service.disable_tracking(
+            telegram_user_id=user_id,
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            tracking_id=tracking_id,
+        )
+        await update.effective_message.reply_text(
+            f"Tracking disabled.\nTracking ID: {tracked.id}\nRepo: {tracked.repo_normalized}"
+        )
+    except (ValidationError, NotFoundError) as exc:
+        await update.effective_message.reply_text(str(exc))
+    except Exception as exc:
+        await update.effective_message.reply_text(f"Could not disable tracking: {exc}")
