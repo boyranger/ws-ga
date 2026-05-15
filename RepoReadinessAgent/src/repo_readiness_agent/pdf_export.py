@@ -165,5 +165,16 @@ def export_report_to_pdf(report: ProductReport, output_path: str | Path, repo_la
             f"Stop condition: {report.follow_up.stop_condition}",
         ], styles["BodySmall"]))
 
+    if report.delta_brief:
+        story.append(Paragraph("Autonomous delta brief", styles["SectionHeading"]))
+        story.append(Paragraph(_escape(report.delta_brief.summary), styles["BodySmall"]))
+        story.append(Paragraph("Yang membaik:", styles["BodySmall"]))
+        story.append(_bullet_list(report.delta_brief.what_improved, styles["BodySmall"]))
+        story.append(Paragraph("Yang masih menghambat:", styles["BodySmall"]))
+        story.append(_bullet_list(report.delta_brief.what_still_blocked, styles["BodySmall"]))
+        story.append(Paragraph(f"Prioritas sekarang: {_escape(report.delta_brief.priority_now)}", styles["BodySmall"]))
+        story.append(Paragraph(f"Aksi founder: {_escape(report.delta_brief.founder_action)}", styles["BodySmall"]))
+        story.append(Paragraph(f"Aksi engineer: {_escape(report.delta_brief.engineer_action)}", styles["BodySmall"]))
+
     doc.build(story)
     return output

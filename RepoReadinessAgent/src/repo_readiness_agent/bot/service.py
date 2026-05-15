@@ -8,7 +8,7 @@ from dataclasses import dataclass
 
 from ..contract import ProductReport, product_report_from_dict
 from ..engine import build_product_report, run_engine
-from ..followup import build_follow_up
+from ..followup import build_delta_brief, build_follow_up
 from ..formatter import render_text_report
 from . import repository as repo_db
 from .storage import Database
@@ -252,6 +252,7 @@ class RepoTrackingService:
             trigger_kind="manual_followup",
         )
         inspect_result.report.follow_up = build_follow_up(previous_report, inspect_result.report)
+        inspect_result.report.delta_brief = build_delta_brief(previous_report, inspect_result.report)
 
         with self.database.connect() as connection:
             repo_db.replace_latest_report_payload(
@@ -321,6 +322,7 @@ class RepoTrackingService:
                 target_stage=job["target_stage"],
                 target_confidence=job["target_confidence"],
             )
+            inspect_result.report.delta_brief = build_delta_brief(previous_report, inspect_result.report)
             with self.database.connect() as connection:
                 repo_db.replace_latest_report_payload(
                     connection,

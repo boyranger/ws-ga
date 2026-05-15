@@ -34,6 +34,16 @@ class FollowUpStatus:
 
 
 @dataclass
+class DeltaBrief:
+    summary: str
+    what_improved: list[str]
+    what_still_blocked: list[str]
+    priority_now: str
+    founder_action: str
+    engineer_action: str
+
+
+@dataclass
 class RemediationHint:
     fix: str
     target_files: list[str]
@@ -62,6 +72,7 @@ class ProductReport:
     top_fixes: list[str]
     remediation_hints: list[RemediationHint] | None = None
     improvement_briefs: list[ImprovementBrief] | None = None
+    delta_brief: DeltaBrief | None = None
     gates: FounderGates | None = None
     follow_up: FollowUpStatus | None = None
 
@@ -79,6 +90,7 @@ def product_report_from_dict(data: dict) -> ProductReport:
     follow_up = data.get("follow_up")
     remediation_hints = data.get("remediation_hints")
     improvement_briefs = data.get("improvement_briefs")
+    delta_brief = data.get("delta_brief")
     return ProductReport(
         stage=data["stage"],
         verdict=data["verdict"],
@@ -87,6 +99,7 @@ def product_report_from_dict(data: dict) -> ProductReport:
         top_fixes=data["top_fixes"],
         remediation_hints=[RemediationHint(**item) for item in remediation_hints] if remediation_hints else None,
         improvement_briefs=[ImprovementBrief(**item) for item in improvement_briefs] if improvement_briefs else None,
+        delta_brief=DeltaBrief(**delta_brief) if delta_brief else None,
         gates=FounderGates(**gates) if gates else None,
         follow_up=FollowUpStatus(**follow_up) if follow_up else None,
     )

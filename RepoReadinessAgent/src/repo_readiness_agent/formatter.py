@@ -265,4 +265,20 @@ def render_text_report(report: ProductReport) -> str:
             ]
         )
 
+    if report.delta_brief:
+        lines.extend(
+            [
+                "",
+                "Autonomous delta brief:",
+                f"- Ringkasan: {report.delta_brief.summary}",
+                "- Yang membaik:",
+                *[f"  - {item}" for item in report.delta_brief.what_improved],
+                "- Yang masih menghambat:",
+                *[f"  - {item}" for item in report.delta_brief.what_still_blocked],
+                f"- Prioritas sekarang: {report.delta_brief.priority_now}",
+                f"- Aksi founder: {report.delta_brief.founder_action}",
+                f"- Aksi engineer: {report.delta_brief.engineer_action}",
+            ]
+        )
+
     return "\n".join(lines)

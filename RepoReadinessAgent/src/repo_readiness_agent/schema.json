@@ -105,6 +105,37 @@
         { "type": "null" }
       ]
     },
+    "delta_brief": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "summary",
+            "what_improved",
+            "what_still_blocked",
+            "priority_now",
+            "founder_action",
+            "engineer_action"
+          ],
+          "properties": {
+            "summary": { "type": "string" },
+            "what_improved": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "what_still_blocked": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "priority_now": { "type": "string" },
+            "founder_action": { "type": "string" },
+            "engineer_action": { "type": "string" }
+          }
+        },
+        { "type": "null" }
+      ]
+    },
     "gates": {
       "anyOf": [
         {
