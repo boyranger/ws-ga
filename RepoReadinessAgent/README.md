@@ -80,6 +80,7 @@ If you need the fastest walkthrough:
 - `docs/architecture_boundaries.md`
 - `docs/public_telegram_bot_architecture.md`
 - `docs/public_telegram_bot_implementation_plan.md`
+- `docs/public_telegram_bot_runbook.md`
 
 ## Product-layer implementation status
 
@@ -100,6 +101,7 @@ Example run:
 - `PYTHONPATH=src python3 -m repo_readiness_agent.cli followup examples/sample_outputs/qris_payment_bot_followup_before.json examples/sample_outputs/qris_payment_bot_followup_after.json`
 - `REPO_READINESS_TELEGRAM_BOT_TOKEN=... PYTHONPATH=src python3 -m repo_readiness_agent.bot.app`
 - `PYTHONPATH=src python3 -m repo_readiness_agent.bot.runner`
+- `pip install -r requirements-bot.txt`
 
 ## Public bot commands (v1 scaffold)
 
@@ -112,6 +114,7 @@ Example run:
 - `/untrack <tracking_id>`
 
 The bot stores user-specific tracking in SQLite and keeps RepoReadinessAgent's scoring/product engine as the source of truth.
+Use `requirements-bot.txt`, `.env.example`, and `docs/public_telegram_bot_runbook.md` to run it locally without committing secrets.
 
 ## Demo artifacts already in repo
 

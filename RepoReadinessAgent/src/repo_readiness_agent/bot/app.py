@@ -7,6 +7,7 @@ from pathlib import Path
 
 from .handlers import (
     followup_handler,
+    help_handler,
     inspect_handler,
     myrepos_handler,
     report_handler,
@@ -41,6 +42,7 @@ def main() -> None:
     application.bot_data["repo_tracking_service"] = build_service()
 
     application.add_handler(CommandHandler("start", start_handler))
+    application.add_handler(CommandHandler("help", help_handler))
     application.add_handler(CommandHandler("inspect", inspect_handler))
     application.add_handler(CommandHandler("track", track_handler))
     application.add_handler(CommandHandler("myrepos", myrepos_handler))

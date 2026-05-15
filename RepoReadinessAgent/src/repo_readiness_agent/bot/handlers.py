@@ -22,7 +22,23 @@ async def start_handler(update: Any, context: Any) -> None:
     await update.effective_message.reply_text(
         "RepoReadinessAgent is ready.\n\n"
         "Try: /inspect https://github.com/owner/repo\n"
-        "Then use /myrepos to see your tracked repositories."
+        "Use /track to enable daily follow-up.\n"
+        "Use /help to see all commands."
+    )
+
+
+async def help_handler(update: Any, context: Any) -> None:
+    del context
+    await update.effective_message.reply_text(
+        "Available commands:\n"
+        "/start\n"
+        "/help\n"
+        "/inspect <github_url>\n"
+        "/track <github_url>\n"
+        "/myrepos\n"
+        "/report <tracking_id>\n"
+        "/followup <tracking_id>\n"
+        "/untrack <tracking_id>"
     )
 
 
