@@ -19,10 +19,18 @@ async def start_handler(update: Any, context: Any) -> None:
     user_id, username, first_name, last_name = _telegram_user_parts(update)
     service: RepoTrackingService = context.application.bot_data["repo_tracking_service"]
     service._upsert_user(user_id, username, first_name, last_name)
+    name = first_name or username or "there"
     await update.effective_message.reply_text(
-        "RepoReadinessAgent is ready.\n\n"
-        "Try: /inspect https://github.com/owner/repo\n"
-        "Use /track to enable daily follow-up.\n"
+        f"Hi {name} — welcome to RepoReadinessAgent.\n\n"
+        "I help you inspect a GitHub repository, judge its readiness stage, and track its progress over time.\n\n"
+        "What you can do here:\n"
+        "- inspect a repo and get a founder-friendly readiness report\n"
+        "- save that repo under your own tracking record\n"
+        "- re-check later and compare whether it improved\n\n"
+        "Best first step:\n"
+        "1. Send /inspect https://github.com/owner/repo\n"
+        "2. Review the stage, verdict, top risks, and top fixes\n"
+        "3. If you want monitoring, use /track https://github.com/owner/repo\n\n"
         "Use /help to see all commands."
     )
 
@@ -30,15 +38,19 @@ async def start_handler(update: Any, context: Any) -> None:
 async def help_handler(update: Any, context: Any) -> None:
     del context
     await update.effective_message.reply_text(
-        "Available commands:\n"
-        "/start\n"
-        "/help\n"
-        "/inspect <github_url>\n"
-        "/track <github_url>\n"
-        "/myrepos\n"
-        "/report <tracking_id>\n"
-        "/followup <tracking_id>\n"
-        "/untrack <tracking_id>"
+        "RepoReadinessAgent commands:\n\n"
+        "/start — introduction and first steps\n"
+        "/help — show this command list\n"
+        "/inspect <github_url> — inspect a repo and generate a readiness report\n"
+        "/track <github_url> — save a repo and enable tracking for it\n"
+        "/myrepos — list your tracked repositories\n"
+        "/report <tracking_id> — show the latest saved report\n"
+        "/followup <tracking_id> — re-check a tracked repo and compare progress\n"
+        "/untrack <tracking_id> — disable tracking for a repo\n\n"
+        "Recommended flow:\n"
+        "1. /inspect a GitHub repo\n"
+        "2. If useful, /track it\n"
+        "3. Later, use /followup to see whether readiness improved"
     )
 
 
