@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://docs.openclaw.ai/schemas/repo_readiness_agent/product-report.schema.json",
+  "title": "Repo Readiness Agent product report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "stage",
+    "verdict",
+    "confidence",
+    "top_risks",
+    "top_fixes",
+    "gates",
+    "follow_up"
+  ],
+  "properties": {
+    "stage": {
+      "type": "string",
+      "enum": ["Prototype", "MVP", "Handoff-ready"]
+    },
+    "verdict": {
+      "type": "string"
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["Low", "Medium", "High"]
+    },
+    "top_risks": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "top_fixes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "gates": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["demo_safe", "launch_ready", "handoff_ready"],
+          "properties": {
+            "demo_safe": { "type": "string", "enum": ["yes", "not yet"] },
+            "launch_ready": { "type": "string", "enum": ["yes", "not yet"] },
+            "handoff_ready": { "type": "string", "enum": ["yes", "not yet"] }
+          }
+        },
+        { "type": "null" }
+      ]
+    },
+    "follow_up": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "stop_condition"],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": ["Improved", "Unchanged", "Still blocked"]
+            },
+            "stop_condition": {
+              "type": "string",
+              "enum": ["Target reached", "Keep monitoring"]
+            }
+          }
+        },
+        { "type": "null" }
+      ]
+    }
+  }
+}

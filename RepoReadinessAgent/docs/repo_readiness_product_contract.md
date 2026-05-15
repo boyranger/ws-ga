@@ -51,6 +51,12 @@ The output should help a founder answer:
 3. What are the biggest risks?
 4. What should I fix next?
 
+### Product JSON contract
+The product-layer JSON contract should be treated as a stable machine-readable output surface for demos, UI wiring, and future integrations.
+
+Canonical schema file:
+- `src/repo_readiness_agent/schema.json`
+
 ---
 
 ## 3. Stage definitions

@@ -57,7 +57,8 @@ The current implementation backbone lives in `tools/repo_quality_scorer/`, while
 The product layer now has a working CLI adapter on top of the scorer engine.
 
 Current product-layer modules:
-- `src/repo_readiness_agent/contract.py` - product-facing report structures
+- `src/repo_readiness_agent/contract.py` - product-facing report structures and canonical vocabulary
+- `src/repo_readiness_agent/schema.json` - canonical JSON schema for product-layer report output
 - `src/repo_readiness_agent/engine.py` - adapter from scorer output into founder-facing product output
 - `src/repo_readiness_agent/formatter.py` - text rendering helpers
 - `src/repo_readiness_agent/followup.py` - follow-up status and stop-condition concepts
@@ -65,3 +66,4 @@ Current product-layer modules:
 
 Example run:
 - `PYTHONPATH=src python3 -m repo_readiness_agent.cli https://github.com/owner/repo`
+- `PYTHONPATH=src python3 -m repo_readiness_agent.cli https://github.com/owner/repo --format json`
