@@ -52,8 +52,7 @@ def product_report_to_json(report: ProductReport) -> str:
     return json.dumps(product_report_to_dict(report), indent=2, ensure_ascii=False)
 
 
-def load_product_report(path: str | Path) -> ProductReport:
-    data = json.loads(Path(path).read_text())
+def product_report_from_dict(data: dict) -> ProductReport:
     gates = data.get("gates")
     follow_up = data.get("follow_up")
     return ProductReport(
@@ -65,3 +64,8 @@ def load_product_report(path: str | Path) -> ProductReport:
         gates=FounderGates(**gates) if gates else None,
         follow_up=FollowUpStatus(**follow_up) if follow_up else None,
     )
+
+
+def load_product_report(path: str | Path) -> ProductReport:
+    data = json.loads(Path(path).read_text())
+    return product_report_from_dict(data)

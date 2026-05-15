@@ -92,11 +92,13 @@ Current product-layer modules:
 - `src/repo_readiness_agent/formatter.py` - text rendering helpers
 - `src/repo_readiness_agent/followup.py` - follow-up status and stop-condition concepts
 - `src/repo_readiness_agent/cli.py` - product-layer CLI entrypoint
+- `src/repo_readiness_agent/bot/` - public Telegram bot scaffold with SQLite storage, per-user tracking, and command handlers
 
 Example run:
 - `PYTHONPATH=src python3 -m repo_readiness_agent.cli inspect https://github.com/owner/repo`
 - `PYTHONPATH=src python3 -m repo_readiness_agent.cli inspect https://github.com/owner/repo --format json`
 - `PYTHONPATH=src python3 -m repo_readiness_agent.cli followup examples/sample_outputs/qris_payment_bot_followup_before.json examples/sample_outputs/qris_payment_bot_followup_after.json`
+- `REPO_READINESS_TELEGRAM_BOT_TOKEN=... PYTHONPATH=src python3 -m repo_readiness_agent.bot.app`
 
 ## Demo artifacts already in repo
 
