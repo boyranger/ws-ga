@@ -1,0 +1,136 @@
+{
+  "schema_version": "1.1.0",
+  "repo": "https://github.com/pallets/flask",
+  "local_path": "/tmp/repo-quality-tppb9yvn",
+  "confidence": "Medium",
+  "verdict": "This repository looks usable for demos or early users, but it still needs focused hardening before handoff.",
+  "maturity_level": "MVP",
+  "code_quality_score": 5.8,
+  "production_readiness_score": 6.9,
+  "founder_gates": {
+    "demo_safe": "yes",
+    "launch_ready": "not yet",
+    "handoff_ready": "not yet"
+  },
+  "follow_up_status_options": [
+    "Improved",
+    "Unchanged",
+    "Still blocked"
+  ],
+  "monitoring_stop_conditions": [
+    "Target reached",
+    "Keep monitoring"
+  ],
+  "breakdown": {
+    "architecture": 5.6,
+    "code_quality": 4.4,
+    "security": 5.2,
+    "testing": 8.1,
+    "documentation": 7.3,
+    "production_readiness": 7.4
+  },
+  "strengths": [
+    "README exists, so the repository has at least a basic documentation entrypoint.",
+    "Repository includes tests (69 detected test files).",
+    "CI workflow files were detected, which improves delivery discipline."
+  ],
+  "risks": [
+    "At least one very large file was detected, which may indicate concentrated complexity.",
+    "No environment example/template was found, which weakens onboarding and config discipline."
+  ],
+  "red_flags": [
+    "Detected 1 security-pattern hit(s) that deserve manual review."
+  ],
+  "top_improvements": [
+    "Split oversized files/functions into smaller units with clearer boundaries.",
+    "Review the flagged security patterns and remove insecure constructs/defaults.",
+    "Add a .env.example or equivalent config template."
+  ],
+  "inputs": {
+    "repo": "https://github.com/pallets/flask",
+    "branch": null,
+    "subdir": null,
+    "strictness": "balanced",
+    "language_hint": null,
+    "output_format": "json"
+  },
+  "facts": {
+    "repo": "https://github.com/pallets/flask",
+    "local_path": "/tmp/repo-quality-tppb9yvn",
+    "branch": null,
+    "files_total": 236,
+    "source_files": 87,
+    "test_files": 69,
+    "doc_files": 11,
+    "has_readme": true,
+    "has_ci": true,
+    "has_docker": false,
+    "has_env_example": false,
+    "has_migrations": false,
+    "has_healthcheck": true,
+    "has_lockfile": true,
+    "has_tests": true,
+    "has_package_json": false,
+    "has_pyproject": true,
+    "has_go_mod": false,
+    "dominant_language": "Python",
+    "languages": {
+      "Python": 83
+    },
+    "max_file_lines": 1971,
+    "top_large_files": [
+      {
+        "path": "tests/test_basic.py",
+        "lines": 1971
+      },
+      {
+        "path": "src/flask/app.py",
+        "lines": 1626
+      },
+      {
+        "path": "src/flask/cli.py",
+        "lines": 1128
+      },
+      {
+        "path": "tests/test_blueprints.py",
+        "lines": 1119
+      },
+      {
+        "path": "src/flask/sansio/app.py",
+        "lines": 1014
+      },
+      {
+        "path": "src/flask/sansio/scaffold.py",
+        "lines": 793
+      },
+      {
+        "path": "tests/test_cli.py",
+        "lines": 704
+      },
+      {
+        "path": "src/flask/sansio/blueprints.py",
+        "lines": 693
+      },
+      {
+        "path": "src/flask/helpers.py",
+        "lines": 683
+      },
+      {
+        "path": "src/flask/ctx.py",
+        "lines": 541
+      }
+    ],
+    "debug_hits": 18,
+    "security_hits": 1,
+    "secret_hits": 0,
+    "entrypoint_hits": 17,
+    "analyzer": {
+      "name": "code-quality-check",
+      "applied": false,
+      "status": "skipped",
+      "summary": "ecosystem not applicable in v1",
+      "exit_code": null,
+      "signals": null
+    }
+  }
+}
