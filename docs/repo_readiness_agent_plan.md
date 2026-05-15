@@ -116,6 +116,8 @@ Responsibilities:
 - repo_quality_scorer
 - code-quality-check where applicable
 
+`code-quality-check` should be treated as a supporting technical analyzer/reference for code-quality signals, not as the outward-facing product itself.
+
 Simple model:
 
 **Clara builds** -> **Repo Readiness Agent presents the product behavior** -> **repo_quality_scorer powers the analysis**
