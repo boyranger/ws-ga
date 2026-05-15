@@ -22,6 +22,23 @@ TEXT_EXTENSIONS = {
     ".cs", ".c", ".cpp", ".h", ".hpp", ".swift", ".scala", ".md", ".txt", ".json", ".yaml",
     ".yml", ".toml", ".ini", ".cfg", ".env", ".sh", ".sql", ".html", ".css",
 }
+CODE_SCAN_EXTENSIONS = {
+    ".py", ".js", ".jsx", ".ts", ".tsx", ".go", ".rs", ".java", ".kt", ".php", ".rb",
+    ".cs", ".c", ".cpp", ".h", ".hpp", ".swift", ".scala", ".sh", ".sql", ".html", ".css",
+}
+CONFIG_SCAN_EXTENSIONS = {".json", ".yaml", ".yml", ".toml", ".ini", ".cfg", ".env"}
+PLACEHOLDER_SECRET_MARKERS = (
+    "change_me",
+    "example",
+    "your_",
+    "placeholder",
+    "dummy",
+    "sample",
+    "test",
+    "<api_key>",
+    "<token>",
+    "<secret>",
+)
 SKIP_DIRS = {
     ".git", "node_modules", ".venv", "venv", "dist", "build", "target", "coverage", ".next",
     ".nuxt", ".idea", ".vscode", "__pycache__", ".mypy_cache", ".pytest_cache",
@@ -40,7 +57,7 @@ SECURITY_PATTERNS = [
     (re.compile(r"cors\s*\(\s*\)"), "CORS without config"),
 ]
 SECRET_PATTERNS = [
-    (re.compile(r"(?i)(api[_-]?key|secret|password|private[_-]?key)\s*[:=]\s*['\"][^'\"]{6,}['\"]"), "possible hardcoded secret"),
+    (re.compile(r"(?im)^\s*(?:export\s+)?(?:[A-Z][A-Z0-9_]*?(?:API[_-]?KEY|SECRET|PASSWORD|TOKEN|PRIVATE[_-]?KEY)[A-Z0-9_]*|(?:api[_-]?key|secret|password|token|private[_-]?key))\s*[:=]\s*['\"][^'\"\n]{6,}['\"]\s*$"), "possible hardcoded secret"),
     (re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"), "embedded private key"),
     (re.compile(r"sk-[A-Za-z0-9]{20,}"), "OpenAI-style key"),
 ]
@@ -143,6 +160,21 @@ def should_scan_text(path: Path) -> bool:
     return False
 
 
+def should_scan_code_patterns(path: Path) -> bool:
+    return path.suffix.lower() in CODE_SCAN_EXTENSIONS or path.name == "Dockerfile"
+
+
+def should_scan_config_patterns(path: Path) -> bool:
+    if path.name == ".env.example":
+        return True
+    return path.suffix.lower() in CONFIG_SCAN_EXTENSIONS
+
+
+def looks_like_placeholder_secret(value: str) -> bool:
+    lowered = value.strip().lower()
+    return any(marker in lowered for marker in PLACEHOLDER_SECRET_MARKERS)
+
+
 def walk_repo(repo_path: Path) -> tuple[RepoFacts, list[str], list[str], list[str]]:
     language_counter: Counter[str] = Counter()
     files_total = 0
@@ -233,12 +265,19 @@ def walk_repo(repo_path: Path) -> tuple[RepoFacts, list[str], list[str], list[st
             if line_count >= 250:
                 top_large_files.append({"path": rel_str, "lines": line_count})
 
-            for pattern in DEBUG_PATTERNS:
-                debug_hits += len(pattern.findall(text))
-            for pattern, _label in SECURITY_PATTERNS:
-                security_hits += len(pattern.findall(text))
-            for pattern, _label in SECRET_PATTERNS:
-                secret_hits += len(pattern.findall(text))
+            if should_scan_code_patterns(path):
+                for pattern in DEBUG_PATTERNS:
+                    debug_hits += len(pattern.findall(text))
+                for pattern, _label in SECURITY_PATTERNS:
+                    security_hits += len(pattern.findall(text))
+
+            if should_scan_code_patterns(path) or should_scan_config_patterns(path):
+                for pattern, _label in SECRET_PATTERNS:
+                    for match in pattern.finditer(text):
+                        snippet = match.group(0)
+                        if looks_like_placeholder_secret(snippet):
+                            continue
+                        secret_hits += 1
 
     top_large_files = sorted(top_large_files, key=lambda item: item["lines"], reverse=True)[:10]
     dominant_language = language_counter.most_common(1)[0][0] if language_counter else "Unknown"
@@ -347,24 +386,28 @@ def score_code_quality(facts: RepoFacts) -> float:
 
 
 def score_security(facts: RepoFacts) -> float:
-    score = 6.0
+    score = 6.2
     if facts.has_env_example:
-        score += 0.5
+        score += 0.6
     if facts.secret_hits > 0:
-        score -= min(4.0, facts.secret_hits * 2.0)
+        score -= min(3.5, facts.secret_hits * 1.8)
     if facts.security_hits > 0:
-        score -= min(3.0, facts.security_hits * 0.8)
+        score -= min(2.5, facts.security_hits * 0.7)
     if not facts.has_env_example and (facts.has_package_json or facts.has_pyproject or facts.has_go_mod):
-        score -= 0.4
+        score -= 0.5
+    if facts.has_ci:
+        score += 0.2
     return clamp(score)
 
 
 def score_testing(facts: RepoFacts) -> float:
     if not facts.has_tests:
         return 2.0
-    score = 4.0
+    score = 3.5
+    if facts.test_files >= 1:
+        score += 0.8
     if facts.test_files >= 3:
-        score += 1.5
+        score += 1.0
     if facts.test_files >= 10:
         score += 1.0
     if facts.has_ci:
@@ -377,34 +420,38 @@ def score_testing(facts: RepoFacts) -> float:
 def score_documentation(facts: RepoFacts) -> float:
     if not facts.has_readme:
         return 3.0
-    score = 5.5
+    score = 5.8
     if facts.doc_files >= 3:
         score += 1.0
+    if facts.doc_files >= 6:
+        score += 0.5
     if facts.has_env_example:
         score += 0.5
     if facts.has_docker:
-        score += 0.4
+        score += 0.3
     return clamp(score)
 
 
 def score_production_readiness(facts: RepoFacts) -> float:
-    score = 4.5
+    score = 4.8
     if facts.has_ci:
-        score += 1.2
+        score += 1.3
     if facts.has_docker:
         score += 1.0
     if facts.has_env_example:
-        score += 0.5
+        score += 0.6
     if facts.has_healthcheck:
-        score += 0.5
+        score += 0.6
     if facts.has_migrations:
-        score += 0.8
+        score += 0.9
     if facts.has_lockfile:
+        score += 0.4
+    if facts.has_tests:
         score += 0.3
-    if not facts.has_tests:
+    else:
         score -= 1.0
     if facts.secret_hits > 0:
-        score -= 1.5
+        score -= 1.2
     return clamp(score)
 
 
@@ -456,7 +503,7 @@ def synthesize_notes(facts: RepoFacts, breakdown: dict[str, float]) -> tuple[lis
         improvements.append("Review the flagged security patterns and remove insecure constructs/defaults.")
     if facts.secret_hits > 0:
         red_flags.append(f"Detected {facts.secret_hits} possible secret exposure hit(s).")
-        improvements.append("Move secrets to environment/config management and scrub hardcoded credentials.")
+        improvements.append("Review possible hardcoded credentials and keep real secrets in environment/config management.")
     if not facts.has_env_example:
         risks.append("No environment example/template was found, which weakens onboarding and config discipline.")
         improvements.append("Add a .env.example or equivalent config template.")
