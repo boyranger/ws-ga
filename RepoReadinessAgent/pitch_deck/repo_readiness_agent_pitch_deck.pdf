@@ -1,0 +1,374 @@
+%PDF-1.4
+%����
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+3 0 obj
+<< /Length 626 >>
+stream
+BT
+/F2 26 Tf
+1 0 0 1 56 548 Tm
+(Repo Readiness Agent) Tj
+ET
+BT
+/F1 15 Tf
+0.2 0.2 0.2 rg
+1 0 0 1 56 518 Tm
+(Autonomous repo readiness for solo founders) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 470 Tm
+(• Hackathon product: founder-facing repo readiness agent) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 440 Tm
+(• Input: a GitHub repository URL) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 410 Tm
+(• Output: a clear readiness decision) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 380 Tm
+(• Core promise: Is this repository still a Prototype, already an MVP, or) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 354 Tm
+(  ready for handoff?) Tj
+ET
+endstream
+endobj
+4 0 obj
+<< /Length 755 >>
+stream
+BT
+/F2 26 Tf
+1 0 0 1 56 548 Tm
+(The Problem) Tj
+ET
+BT
+/F1 15 Tf
+0.2 0.2 0.2 rg
+1 0 0 1 56 518 Tm
+(Founders can ship fast, but still lack engineering certainty) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 470 Tm
+(• AI tools help solo founders build quickly) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 440 Tm
+(• But speed does not guarantee repo quality or readiness) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 410 Tm
+(• Existing tools give warnings, scores, and code smells) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 380 Tm
+(• They usually do not answer the founder's real question) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 350 Tm
+(• Founder question: Is this repo solid enough to demo, launch, or hand) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 324 Tm
+(  off?) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Length 635 >>
+stream
+BT
+/F2 26 Tf
+1 0 0 1 56 548 Tm
+(The Solution) Tj
+ET
+BT
+/F1 15 Tf
+0.2 0.2 0.2 rg
+1 0 0 1 56 518 Tm
+(Repo Readiness Agent turns repo evidence into a founder decision) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 470 Tm
+(• Founder submits a GitHub repository) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 440 Tm
+(• Agent inspects the repo autonomously) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 410 Tm
+(• Agent synthesizes engineering signals into founder language) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 380 Tm
+(• Founder-facing output: Stage, Verdict, Top risks, Top 3 fixes,) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 354 Tm
+(  Confidence) Tj
+ET
+endstream
+endobj
+6 0 obj
+<< /Length 628 >>
+stream
+BT
+/F2 26 Tf
+1 0 0 1 56 548 Tm
+(Why This Is an Agent) Tj
+ET
+BT
+/F1 15 Tf
+0.2 0.2 0.2 rg
+1 0 0 1 56 518 Tm
+(The user gives only the repository. The agent does the rest.) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 470 Tm
+(• Repo Intake) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 440 Tm
+(• Signal Inspection) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 410 Tm
+(• Readiness Judgment) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 380 Tm
+(• Founder Guidance) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 350 Tm
+(• Optional follow-up: Improved / Unchanged / Still blocked until target) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 324 Tm
+(  reached) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Length 964 >>
+stream
+BT
+/F2 26 Tf
+1 0 0 1 56 548 Tm
+(Demo Output Example) Tj
+ET
+BT
+/F1 15 Tf
+0.2 0.2 0.2 rg
+1 0 0 1 56 518 Tm
+(Sample founder-facing result from a public repository) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 470 Tm
+(• Stage: MVP) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 440 Tm
+(• Verdict: usable for demos or early users, but still needs focused) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 414 Tm
+(  hardening before handoff) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 384 Tm
+(• Confidence: Medium) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 354 Tm
+(• Top risks: large files and missing environment template) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 324 Tm
+(• Top fixes: split oversized files, review flagged security patterns, add) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 298 Tm
+(  .env.example) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 268 Tm
+(• Founder gates: Demo-safe yes, Launch-ready not yet, Handoff-ready not) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 242 Tm
+(  yet) Tj
+ET
+endstream
+endobj
+8 0 obj
+<< /Length 729 >>
+stream
+BT
+/F2 26 Tf
+1 0 0 1 56 548 Tm
+(Why It Matters) Tj
+ET
+BT
+/F1 15 Tf
+0.2 0.2 0.2 rg
+1 0 0 1 56 518 Tm
+(Better next-step decisions for solo founders) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 470 Tm
+(• Know whether a repo is ready for a demo) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 440 Tm
+(• Reduce hidden technical risk before launch) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 410 Tm
+(• Prepare cleaner handoff to engineers or contractors) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 380 Tm
+(• Focus only on the fixes that matter most next) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 350 Tm
+(• Closing line: Repo Readiness Agent turns repository evidence into a) Tj
+ET
+BT
+/F1 18 Tf
+0 0 0 rg
+1 0 0 1 72 324 Tm
+(  founder decision.) Tj
+ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 15 0 R /MediaBox [0 0 792 612] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 3 0 R >>
+endobj
+10 0 obj
+<< /Type /Page /Parent 15 0 R /MediaBox [0 0 792 612] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 4 0 R >>
+endobj
+11 0 obj
+<< /Type /Page /Parent 15 0 R /MediaBox [0 0 792 612] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 5 0 R >>
+endobj
+12 0 obj
+<< /Type /Page /Parent 15 0 R /MediaBox [0 0 792 612] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 6 0 R >>
+endobj
+13 0 obj
+<< /Type /Page /Parent 15 0 R /MediaBox [0 0 792 612] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 7 0 R >>
+endobj
+14 0 obj
+<< /Type /Page /Parent 15 0 R /MediaBox [0 0 792 612] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 8 0 R >>
+endobj
+15 0 obj
+<< /Type /Pages /Count 6 /Kids [9 0 R 10 0 R 11 0 R 12 0 R 13 0 R 14 0 R] >>
+endobj
+16 0 obj
+<< /Type /Catalog /Pages 15 0 R >>
+endobj
+xref
+0 17
+0000000000 65535 f 
+0000000015 00000 n 
+0000000085 00000 n 
+0000000160 00000 n 
+0000000837 00000 n 
+0000001643 00000 n 
+0000002329 00000 n 
+0000003008 00000 n 
+0000004023 00000 n 
+0000004803 00000 n 
+0000004940 00000 n 
+0000005078 00000 n 
+0000005216 00000 n 
+0000005354 00000 n 
+0000005492 00000 n 
+0000005630 00000 n 
+0000005723 00000 n 
+trailer
+<< /Size 17 /Root 16 0 R >>
+startxref
+5774
+%%EOF
