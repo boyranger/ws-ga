@@ -82,6 +82,7 @@ The agent:
    - documentation
    - production readiness
 4. uses backbone analyzers when relevant
+   - for example, `code-quality-check` can be treated as a technical reference/backbone analyzer for code-quality-specific signals
 5. synthesizes findings into founder-friendly outputs:
    - stage classification
    - verdict
@@ -160,6 +161,8 @@ The important point is that the user does not need to manually tell the system w
 ### Creativity
 
 The creative leap is not "another code quality checker".
+
+It may reuse lower-level analyzers such as `code-quality-check`, but the product value stays at the repo-readiness decision layer.
 
 It reframes repository analysis into a **founder decision-support system**.
 

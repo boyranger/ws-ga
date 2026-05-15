@@ -1,3 +1,6 @@
 .openclaw/
 tools/scrapling_browser/.venv/
 __pycache__/
+.venv-notebooklm/
+MEMORY.md
+memory/.dreams/

@@ -22,6 +22,8 @@ This creates uncertainty before demos, launches, hiring, or client handoff.
 
 The agent takes a GitHub URL, clones the repository, inspects key engineering signals across architecture, code quality, security, testing, documentation, and production readiness, and runs a backbone analyzer when relevant.
 
+In the current implementation direction, `code-quality-check` is used as a technical reference/backbone analyzer for code-quality-related signals where applicable, while Repo Readiness Agent expands beyond that into repo-level readiness judgment.
+
 It then synthesizes those signals into founder-friendly outputs:
 - stage classification
 - verdict
@@ -43,6 +45,8 @@ The product is autonomous because the agent does not require the user to specify
 ### Creativity
 
 The creative leap is reframing repository analysis from a developer-only code quality tool into a founder decision-support agent. Instead of outputting raw technical diagnostics, it answers a higher-level question in founder language: is this project still a Prototype, already an MVP, or ready for handoff?
+
+It can reuse lower-level analyzers such as `code-quality-check` when useful, but its main value is not raw linting. Its main value is converting technical repo evidence into a founder decision: what stage is this repo in, what are the top blockers, and what should be fixed next?
 
 ### Clarity
 
