@@ -253,6 +253,11 @@ def _has_any(text: str, keywords: list[str]) -> bool:
     return any(keyword in text for keyword in keywords)
 
 
+def _looks_like_reference_only(text: str) -> bool:
+    return _has_any(text, ["repo ini", "yang tadi", "yang terakhir", "yang barusan"]) \
+        and not _extract_github_url(text)
+
+
 async def conversational_message_handler(update: Any, context: Any) -> None:
     if not update.effective_message or not update.effective_message.text:
         return
@@ -290,6 +295,36 @@ async def conversational_message_handler(update: Any, context: Any) -> None:
         wants_latest_repo = _has_any(lowered, ["repo terakhir", "analisis terakhir", "repo yang terakhir dicek"])
         wants_founder_relay = _has_any(lowered, ["relay", "delegasikan", "solo founder", "kerjakan sendiri", "delegasi ke engineer"])
 
+        if _looks_like_reference_only(lowered) and not active_repo_url:
+            repos = service.list_repos_for_user(
+                telegram_user_id=user_id,
+                username=username,
+                first_name=first_name,
+                last_name=last_name,
+            )
+            if len(repos) == 1:
+                active_repo_url = repos[0].repo_normalized
+                active_tracking_id = repos[0].tracking_id
+                service.remember_conversation_state(
+                    telegram_user_id=user_id,
+                    username=username,
+                    first_name=first_name,
+                    last_name=last_name,
+                    active_tracking_id=active_tracking_id,
+                    active_repo_url=active_repo_url,
+                    last_user_goal="resolve_reference",
+                    last_agent_action="auto_select_only_repo",
+                    conversation_summary=f"Repo aktif otomatis diarahkan ke {active_repo_url} karena hanya ada satu repo yang relevan.",
+                )
+            elif len(repos) > 1:
+                lines = ["Aku belum yakin `repo ini` merujuk ke yang mana. Pilih salah satu ya:"]
+                for item in repos[:5]:
+                    latest = f"{item.latest_stage} / {item.latest_confidence}" if item.latest_stage else "belum ada report"
+                    lines.append(f"- #{item.tracking_id} {item.repo_normalized} — {latest}")
+                lines.append("Kamu bisa balas dengan URL repo, atau bilang misalnya: `cek lagi repo #12`.")
+                await _reply_text_safe(update.effective_message, "\n".join(lines))
+                return
+
         if wants_track and active_repo_url:
             tracked = service.enable_tracking(
                 telegram_user_id=user_id,
@@ -297,6 +332,17 @@ async def conversational_message_handler(update: Any, context: Any) -> None:
                 first_name=first_name,
                 last_name=last_name,
                 repo_url=active_repo_url,
+            )
+            service.remember_conversation_state(
+                telegram_user_id=user_id,
+                username=username,
+                first_name=first_name,
+                last_name=last_name,
+                active_tracking_id=tracked.id,
+                active_repo_url=tracked.repo_normalized,
+                last_user_goal="track_repo",
+                last_agent_action="conversational_track",
+                conversation_summary=f"User meminta tracking aktif untuk {tracked.repo_normalized}.",
             )
             await _reply_text_safe(
                 update.effective_message,
@@ -312,6 +358,17 @@ async def conversational_message_handler(update: Any, context: Any) -> None:
                 last_name=last_name,
                 tracking_id=active_tracking_id,
             )
+            service.remember_conversation_state(
+                telegram_user_id=user_id,
+                username=username,
+                first_name=first_name,
+                last_name=last_name,
+                active_tracking_id=result.tracked_repo.id,
+                active_repo_url=result.tracked_repo.repo_normalized,
+                last_user_goal="followup_repo",
+                last_agent_action="conversational_followup",
+                conversation_summary=f"User baru saja meminta follow-up untuk {result.tracked_repo.repo_normalized}.",
+            )
             await _reply_text_safe(
                 update.effective_message,
                 f"Saya sudah cek ulang repo aktif kamu.\nTracking ID: {result.tracked_repo.id}\nRepo: {result.tracked_repo.repo_normalized}\n\n{result.rendered_text}"
@@ -325,6 +382,17 @@ async def conversational_message_handler(update: Any, context: Any) -> None:
                 first_name=first_name,
                 last_name=last_name,
                 repo_url=active_repo_url,
+            )
+            service.remember_conversation_state(
+                telegram_user_id=user_id,
+                username=username,
+                first_name=first_name,
+                last_name=last_name,
+                active_tracking_id=result.tracking_id,
+                active_repo_url=active_repo_url,
+                last_user_goal="inspect_repo",
+                last_agent_action="conversational_inspect",
+                conversation_summary=f"User baru saja menginspeksi {active_repo_url}.",
             )
             await _reply_text_safe(
                 update.effective_message,
@@ -364,6 +432,17 @@ async def conversational_message_handler(update: Any, context: Any) -> None:
             tracked_repo = latest_analysis.tracked_repo
 
             if wants_risks:
+                service.remember_conversation_state(
+                    telegram_user_id=user_id,
+                    username=username,
+                    first_name=first_name,
+                    last_name=last_name,
+                    active_tracking_id=tracked_repo.id,
+                    active_repo_url=tracked_repo.repo_normalized,
+                    last_user_goal="explain_risks",
+                    last_agent_action="answer_top_risks",
+                    conversation_summary=f"User sedang membahas risiko utama untuk {tracked_repo.repo_normalized}.",
+                )
                 risks = "\n".join(f"- {risk}" for risk in report.top_risks)
                 await update.effective_message.reply_text(
                     f"Dari analisis terakhir untuk {tracked_repo.repo_normalized}, risiko utamanya adalah:\n{risks}"
@@ -371,6 +450,17 @@ async def conversational_message_handler(update: Any, context: Any) -> None:
                 return
 
             if wants_prompts:
+                service.remember_conversation_state(
+                    telegram_user_id=user_id,
+                    username=username,
+                    first_name=first_name,
+                    last_name=last_name,
+                    active_tracking_id=tracked_repo.id,
+                    active_repo_url=tracked_repo.repo_normalized,
+                    last_user_goal="generate_fix_prompts",
+                    last_agent_action="answer_fix_prompts",
+                    conversation_summary=f"User sedang meminta prompt perbaikan untuk {tracked_repo.repo_normalized}.",
+                )
                 prompts = build_fix_prompts(report)
                 await _reply_text_safe(
                     update.effective_message,
@@ -379,6 +469,17 @@ async def conversational_message_handler(update: Any, context: Any) -> None:
                 return
 
             if wants_fixes:
+                service.remember_conversation_state(
+                    telegram_user_id=user_id,
+                    username=username,
+                    first_name=first_name,
+                    last_name=last_name,
+                    active_tracking_id=tracked_repo.id,
+                    active_repo_url=tracked_repo.repo_normalized,
+                    last_user_goal="explain_top_fixes",
+                    last_agent_action="answer_top_fixes",
+                    conversation_summary=f"User sedang membahas top fixes untuk {tracked_repo.repo_normalized}.",
+                )
                 fixes = "\n".join(f"- {fix}" for fix in report.top_fixes)
                 await update.effective_message.reply_text(
                     f"Untuk repo {tracked_repo.repo_normalized}, langkah perbaikan yang paling disarankan sekarang:\n{fixes}"
@@ -415,6 +516,17 @@ async def conversational_message_handler(update: Any, context: Any) -> None:
                 return
 
             if wants_founder_relay:
+                service.remember_conversation_state(
+                    telegram_user_id=user_id,
+                    username=username,
+                    first_name=first_name,
+                    last_name=last_name,
+                    active_tracking_id=tracked_repo.id,
+                    active_repo_url=tracked_repo.repo_normalized,
+                    last_user_goal="founder_relay",
+                    last_agent_action="answer_founder_relay",
+                    conversation_summary=f"User sedang meminta relay founder-facing untuk {tracked_repo.repo_normalized}.",
+                )
                 relays = build_founder_relays(report)
                 await _reply_text_safe(
                     update.effective_message,

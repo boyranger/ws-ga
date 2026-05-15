@@ -356,3 +356,32 @@ class RepoTrackingService:
         self._upsert_user(telegram_user_id, username, first_name, last_name)
         with self.database.connect() as connection:
             return repo_db.get_conversation_state(connection, telegram_user_id=telegram_user_id)
+
+    def remember_conversation_state(
+        self,
+        *,
+        telegram_user_id: str,
+        username: str | None,
+        first_name: str | None,
+        last_name: str | None,
+        active_tracking_id: int | None = None,
+        active_repo_url: str | None = None,
+        last_report_id: int | None = None,
+        last_user_goal: str | None = None,
+        last_agent_action: str | None = None,
+        conversation_summary: str | None = None,
+    ) -> ConversationState:
+        self._upsert_user(telegram_user_id, username, first_name, last_name)
+        with self.database.connect() as connection:
+            state = repo_db.upsert_conversation_state(
+                connection,
+                telegram_user_id=telegram_user_id,
+                active_tracking_id=active_tracking_id,
+                active_repo_url=active_repo_url,
+                last_report_id=last_report_id,
+                last_user_goal=last_user_goal,
+                last_agent_action=last_agent_action,
+                conversation_summary=conversation_summary,
+            )
+            connection.commit()
+            return state
