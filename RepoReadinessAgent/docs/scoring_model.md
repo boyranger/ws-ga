@@ -23,6 +23,8 @@ The scoring model helps the product stay:
 - consistent
 - demoable
 
+Important: the scoring model exists to support the readiness judgment, not to replace it.
+
 ---
 
 ## Core scoring dimensions
@@ -116,6 +118,11 @@ Scores do not exist for their own sake.
 
 They support the founder-facing readiness judgment.
 
+A strong product explanation is:
+- dimensions provide evidence
+- scores summarize patterns
+- the stage converts that evidence into a founder-usable decision
+
 ### Prototype
 Typical meaning:
 - promising early build
@@ -135,6 +142,8 @@ Typical meaning:
 - docs/tests/ops signals are materially stronger
 
 The exact stage judgment should combine score patterns, evidence, and practical interpretation.
+
+This is why Repo Readiness Agent should not be framed as only a score engine. It is a judgment product built on top of scoring.
 
 ---
 

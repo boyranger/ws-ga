@@ -33,6 +33,8 @@ Turn a GitHub repository into a clear founder decision:
 
 And tell the founder what to fix next.
 
+The product should reduce repo readiness uncertainty, not just produce another technical report.
+
 ---
 
 ## Core problem
@@ -75,6 +77,8 @@ Optional founder-facing gates:
 - **Demo-safe?**
 - **Launch-ready?**
 - **Handoff-ready?**
+
+The report should read like a founder decision artifact, not a raw engineering dump.
 
 ---
 
@@ -126,6 +130,10 @@ It should not sound like:
 - raw lint output
 - academic scoring jargon
 - generic code-review noise
+
+A good tone test:
+- a founder should understand the verdict quickly
+- an engineer should still respect the reasoning behind it
 
 ---
 
