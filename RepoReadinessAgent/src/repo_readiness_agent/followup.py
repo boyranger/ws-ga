@@ -6,21 +6,19 @@ monitoring behavior has a single source of truth.
 
 from __future__ import annotations
 
-from .contract import FollowUpStatus, ProductReport
+from .contract import (
+    CONFIDENCE_LEVELS,
+    FOLLOW_UP_KINDS,
+    STAGES,
+    STOP_CONDITIONS,
+    FollowUpStatus,
+    ProductReport,
+)
 
-FOLLOW_UP_STATUSES = [
-    "Improved",
-    "Unchanged",
-    "Still blocked",
-]
+FOLLOW_UP_STATUSES = list(FOLLOW_UP_KINDS)
 
-STOP_CONDITIONS = [
-    "Target reached",
-    "Keep monitoring",
-]
-
-_STAGE_ORDER = {"Prototype": 1, "MVP": 2, "Handoff-ready": 3}
-_CONFIDENCE_ORDER = {"Low": 1, "Medium": 2, "High": 3}
+_STAGE_ORDER = {stage: index for index, stage in enumerate(STAGES, start=1)}
+_CONFIDENCE_ORDER = {level: index for index, level in enumerate(CONFIDENCE_LEVELS, start=1)}
 
 
 def build_follow_up(
