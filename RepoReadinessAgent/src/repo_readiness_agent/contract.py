@@ -42,6 +42,18 @@ class RemediationHint:
 
 
 @dataclass
+class ImprovementBrief:
+    fix: str
+    objective: str
+    target_files: list[str]
+    why_now: str
+    do_it_yourself: list[str]
+    delegate_to_engineer: list[str]
+    acceptance_criteria: list[str]
+    verification_steps: list[str]
+
+
+@dataclass
 class ProductReport:
     stage: Stage
     verdict: str
@@ -49,6 +61,7 @@ class ProductReport:
     top_risks: list[str]
     top_fixes: list[str]
     remediation_hints: list[RemediationHint] | None = None
+    improvement_briefs: list[ImprovementBrief] | None = None
     gates: FounderGates | None = None
     follow_up: FollowUpStatus | None = None
 
@@ -65,6 +78,7 @@ def product_report_from_dict(data: dict) -> ProductReport:
     gates = data.get("gates")
     follow_up = data.get("follow_up")
     remediation_hints = data.get("remediation_hints")
+    improvement_briefs = data.get("improvement_briefs")
     return ProductReport(
         stage=data["stage"],
         verdict=data["verdict"],
@@ -72,6 +86,7 @@ def product_report_from_dict(data: dict) -> ProductReport:
         top_risks=data["top_risks"],
         top_fixes=data["top_fixes"],
         remediation_hints=[RemediationHint(**item) for item in remediation_hints] if remediation_hints else None,
+        improvement_briefs=[ImprovementBrief(**item) for item in improvement_briefs] if improvement_briefs else None,
         gates=FounderGates(**gates) if gates else None,
         follow_up=FollowUpStatus(**follow_up) if follow_up else None,
     )

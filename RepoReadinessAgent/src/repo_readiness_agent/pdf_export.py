@@ -12,7 +12,7 @@ from reportlab.lib.units import mm
 from reportlab.platypus import ListFlowable, ListItem, Paragraph, SimpleDocTemplate, Spacer
 
 from .contract import ProductReport
-from .formatter import build_fix_prompts
+from .formatter import build_autonomous_improvement_briefs, build_fix_prompts, build_founder_relays
 
 
 def _styles():
@@ -127,6 +127,20 @@ def export_report_to_pdf(report: ProductReport, output_path: str | Path, repo_la
             if hint.line_hints:
                 story.append(Paragraph("Line/area yang patut dicek dulu:", styles["BodySmall"]))
                 story.append(_bullet_list(hint.line_hints, styles["BodySmall"]))
+            story.append(Spacer(1, 3))
+
+    briefs = build_autonomous_improvement_briefs(report)
+    if briefs:
+        story.append(Paragraph("Autonomous improvement brief", styles["SectionHeading"]))
+        for brief in briefs:
+            story.append(Paragraph(_escape(brief), styles["BodySmall"]))
+            story.append(Spacer(1, 3))
+
+    relays = build_founder_relays(report)
+    if relays:
+        story.append(Paragraph("Relay rekomendasi untuk solo founder", styles["SectionHeading"]))
+        for relay in relays:
+            story.append(Paragraph(_escape(relay), styles["BodySmall"]))
             story.append(Spacer(1, 3))
 
     prompts = build_fix_prompts(report)

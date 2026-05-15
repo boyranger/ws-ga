@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from .contract import FounderGates, ProductReport, RemediationHint
+from .contract import FounderGates, ImprovementBrief, ProductReport, RemediationHint
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
 REPO_ROOT = PACKAGE_ROOT.parent.parent
@@ -113,6 +113,61 @@ def _build_remediation_hints(score_report: dict[str, Any], fixes: list[str]) -> 
     return hints
 
 
+def _build_improvement_briefs(
+    stage: str,
+    confidence: str,
+    fixes: list[str],
+    hints: list[RemediationHint],
+) -> list[ImprovementBrief]:
+    briefs: list[ImprovementBrief] = []
+    hint_map = {hint.fix: hint for hint in hints}
+
+    for fix in fixes:
+        hint = hint_map.get(fix)
+        target_files = list(hint.target_files[:3]) if hint and hint.target_files else ["README.md", "src/"]
+        why_now = hint.why if hint else "Perbaikan ini kemungkinan memberi dampak paling cepat pada readiness repo saat ini."
+        primary_target = target_files[0]
+        line_hint = hint.line_hints[0] if hint and hint.line_hints else None
+
+        do_it_yourself = [
+            f"Mulai dari {primary_target} dan fokus ke perubahan paling kecil yang langsung mengurangi risiko utama.",
+            f"Pastikan perubahan tetap proporsional dengan tahap repo saat ini: {stage}.",
+            "Setelah perubahan selesai, cek ulang apakah top fix ini benar-benar tertangani, bukan hanya dipindahkan ke tempat lain.",
+        ]
+        delegate_to_engineer = [
+            f"Minta engineer fokus pada tujuan ini: {fix}",
+            f"Batasi scope ke file/area berikut dulu: {', '.join(target_files)}.",
+            "Minta patch kecil, alasan perubahan, dan bukti verifikasi — jangan langsung rewrite besar.",
+        ]
+        acceptance_criteria = [
+            f"Perbaikan untuk '{fix}' sudah terlihat jelas di file target utama.",
+            "Tidak ada regresi yang obvious pada flow utama repo.",
+            f"Readiness repo setelah perbaikan lebih kuat dari kondisi confidence saat ini: {confidence}.",
+        ]
+        verification_steps = [
+            "Jalankan test/lint/build yang relevan bila tersedia.",
+            "Cek ulang README, config, atau workflow terkait agar konsisten dengan perubahan.",
+            "Bandingkan hasil inspect/follow-up berikutnya untuk memastikan risiko benar-benar menurun.",
+        ]
+        if line_hint:
+            do_it_yourself.insert(1, f"Mulai review dari area ini dulu: {line_hint}.")
+            delegate_to_engineer.insert(1, f"Area scan yang paling layak dicek dulu: {line_hint}.")
+
+        briefs.append(
+            ImprovementBrief(
+                fix=fix,
+                objective=f"Naikkan readiness repo dengan menyelesaikan: {fix}",
+                target_files=target_files,
+                why_now=why_now,
+                do_it_yourself=do_it_yourself,
+                delegate_to_engineer=delegate_to_engineer,
+                acceptance_criteria=acceptance_criteria,
+                verification_steps=verification_steps,
+            )
+        )
+    return briefs
+
+
 def build_product_report(score_report: dict[str, Any]) -> ProductReport:
     risks = list(score_report.get("risks") or [])[:3]
     fixes = list(score_report.get("top_improvements") or [])[:3]
@@ -122,12 +177,20 @@ def build_product_report(score_report: dict[str, Any]) -> ProductReport:
     if not fixes:
         fixes = ["No specific next fixes were surfaced by the current lightweight scan."]
 
+    remediation_hints = _build_remediation_hints(score_report, fixes)
+
     return ProductReport(
         stage=score_report["maturity_level"],
         verdict=score_report["verdict"],
         confidence=score_report["confidence"],
         top_risks=risks,
         top_fixes=fixes,
-        remediation_hints=_build_remediation_hints(score_report, fixes),
+        remediation_hints=remediation_hints,
+        improvement_briefs=_build_improvement_briefs(
+            score_report["maturity_level"],
+            score_report["confidence"],
+            fixes,
+            remediation_hints,
+        ),
         gates=derive_founder_gates(score_report),
     )

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from .contract import ProductReport
+from .contract import ImprovementBrief, ProductReport, RemediationHint
 
 
 def _guess_fix_focus(fix: str) -> tuple[str, list[str], list[str]]:
@@ -98,6 +98,76 @@ def _guess_fix_focus(fix: str) -> tuple[str, list[str], list[str]]:
     )
 
 
+def _find_hint_for_fix(report: ProductReport, fix: str) -> RemediationHint | None:
+    if not report.remediation_hints:
+        return None
+    for hint in report.remediation_hints:
+        if hint.fix == fix:
+            return hint
+    return None
+
+
+def _relay_lines_for_fix(index: int, fix: str, hint: RemediationHint | None) -> list[str]:
+    focus, _, deliverables = _guess_fix_focus(fix)
+    target_files = hint.target_files if hint and hint.target_files else []
+    primary_target = target_files[0] if target_files else "file atau area yang paling terkait dengan perbaikan ini"
+    target_summary = ", ".join(target_files[:3]) if target_files else "file/area implementasi yang paling relevan"
+
+    owner_self = (
+        f"Buka {primary_target}, pahami masalah inti di area itu, lalu lakukan perubahan kecil yang langsung menaikkan readiness untuk fokus {focus.lower()}."
+    )
+    owner_delegate = (
+        f"Minta engineer fokus pada {target_summary}, jelaskan bahwa tujuan utamanya adalah '{fix}', lalu minta perubahan yang sempit, bukan rewrite besar."
+    )
+    owner_acceptance = (
+        f"{deliverables[0]}; {deliverables[1]}; {deliverables[2]}."
+    )
+
+    lines = [
+        f"Relay {index}: {fix}",
+        f"- Kalau kamu kerjakan sendiri: {owner_self}",
+        f"- Kalau kamu delegasikan ke engineer: {owner_delegate}",
+        f"- Hasil jadi yang harus kamu minta: {owner_acceptance}",
+    ]
+    if hint and hint.line_hints:
+        lines.append(f"- Area awal yang sebaiknya dilihat dulu: {hint.line_hints[0]}")
+    return lines
+
+
+def build_founder_relays(report: ProductReport) -> list[str]:
+    relays: list[str] = []
+    for index, fix in enumerate(report.top_fixes, start=1):
+        hint = _find_hint_for_fix(report, fix)
+        relays.append("\n".join(_relay_lines_for_fix(index, fix, hint)))
+    return relays
+
+
+def build_autonomous_improvement_briefs(report: ProductReport) -> list[str]:
+    briefs = report.improvement_briefs or []
+    rendered: list[str] = []
+    for index, brief in enumerate(briefs, start=1):
+        rendered.append(
+            "\n".join(
+                [
+                    f"Brief {index}: {brief.fix}",
+                    f"- Objective: {brief.objective}",
+                    f"- Kenapa sekarang: {brief.why_now}",
+                    "- File target:",
+                    *[f"  - {item}" for item in brief.target_files],
+                    "- Kalau kamu kerjakan sendiri:",
+                    *[f"  - {item}" for item in brief.do_it_yourself],
+                    "- Kalau kamu delegasikan ke engineer:",
+                    *[f"  - {item}" for item in brief.delegate_to_engineer],
+                    "- Acceptance criteria:",
+                    *[f"  - {item}" for item in brief.acceptance_criteria],
+                    "- Verifikasi:",
+                    *[f"  - {item}" for item in brief.verification_steps],
+                ]
+            )
+        )
+    return rendered
+
+
 def build_fix_prompts(report: ProductReport) -> list[str]:
     prompts: list[str] = []
     for index, fix in enumerate(report.top_fixes, start=1):
@@ -155,6 +225,18 @@ def render_text_report(report: ProductReport) -> str:
             if hint.line_hints:
                 lines.append("Line/area yang patut dicek dulu:")
                 lines.extend(f"- {item}" for item in hint.line_hints)
+
+    briefs = build_autonomous_improvement_briefs(report)
+    if briefs:
+        lines.extend(["", "Autonomous improvement brief:"])
+        for brief in briefs:
+            lines.extend(["", brief])
+
+    relays = build_founder_relays(report)
+    if relays:
+        lines.extend(["", "Relay rekomendasi untuk solo founder:"])
+        for relay in relays:
+            lines.extend(["", relay])
 
     prompts = build_fix_prompts(report)
     if prompts:

@@ -58,6 +58,53 @@
         { "type": "null" }
       ]
     },
+    "improvement_briefs": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "fix",
+              "objective",
+              "target_files",
+              "why_now",
+              "do_it_yourself",
+              "delegate_to_engineer",
+              "acceptance_criteria",
+              "verification_steps"
+            ],
+            "properties": {
+              "fix": { "type": "string" },
+              "objective": { "type": "string" },
+              "target_files": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "why_now": { "type": "string" },
+              "do_it_yourself": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "delegate_to_engineer": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "acceptance_criteria": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "verification_steps": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        },
+        { "type": "null" }
+      ]
+    },
     "gates": {
       "anyOf": [
         {
