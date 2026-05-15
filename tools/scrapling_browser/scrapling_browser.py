@@ -70,16 +70,16 @@ def fetch_page(args):
 
 
 def fetch_url(url: str, args):
-    class TempArgs:
-        dynamic = args.dynamic
-        stealthy = args.stealthy
-        adaptive = args.adaptive
-        timeout = args.timeout
-        headless = args.headless
-        network_idle = args.network_idle
-        url = url
-
-    return fetch_page(TempArgs)
+    temp_args = argparse.Namespace(
+        dynamic=args.dynamic,
+        stealthy=args.stealthy,
+        adaptive=args.adaptive,
+        timeout=args.timeout,
+        headless=args.headless,
+        network_idle=args.network_idle,
+        url=url,
+    )
+    return fetch_page(temp_args)
 
 
 def normalize_github_url(url: str) -> str:
