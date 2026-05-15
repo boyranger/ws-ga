@@ -1,28 +1,63 @@
 # repo_quality_scorer
 
-Status: planning / scaffold only
+A lightweight repository-level scorer for:
+- code quality
+- production readiness
 
-This folder is reserved for the upcoming `repo_quality_scorer` tool.
+It accepts a GitHub repository URL or local repository path, inspects the repository, optionally uses `code-quality-check` as a backbone analyzer, and produces a structured score report.
 
-Purpose:
-- score GitHub repositories for code quality and production readiness
-- use `code-quality-check` as a backbone analyzer where applicable
-- produce a structured breakdown across:
-  - Architecture
-  - Code quality
-  - Security
-  - Testing
-  - Documentation
-  - Production readiness
+## Status
 
-Current source of truth for scope:
+Early v1 implementation.
+
+## Files
+
+- `repo_quality_scorer.py` - CLI scorer
+- `rubric.md` - scoring rubric snapshot
+- `README.md` - usage notes
+
+## Usage
+
+### Score a GitHub repository
+
+```bash
+python3 tools/repo_quality_scorer/repo_quality_scorer.py https://github.com/mahdyarief/qris-payment-bot
+```
+
+### Score a local repository
+
+```bash
+python3 tools/repo_quality_scorer/repo_quality_scorer.py /path/to/repo
+```
+
+### Output JSON
+
+```bash
+python3 tools/repo_quality_scorer/repo_quality_scorer.py https://github.com/mahdyarief/qris-payment-bot --format json
+```
+
+## Current behavior
+
+The scorer currently:
+- clones the repository if a GitHub URL is provided
+- detects simple ecosystem signals
+- inspects source/test/doc/deploy/config hints
+- scans for a small set of security/secret/debug patterns
+- computes 6 dimension scores
+- computes:
+  - Code Quality Score
+  - Production Readiness Score
+- renders text or JSON
+
+## Current limitations
+
+- heuristics are intentionally simple in v1
+- language support is broad but shallow
+- `code-quality-check` integration is best-effort
+- production readiness is estimated from repository evidence, not runtime validation
+
+## Source of truth
+
+See:
 - `docs/repo_quality_scorer_guideline.md`
-
-Planned responsibilities:
-- fetch/clone repository from GitHub URL
-- inspect important files and structure
-- run backbone analyzers when relevant
-- compute dimension scores
-- render text and JSON reports
-
-No implementation is committed here yet beyond this placeholder.
+- `tools/repo_quality_scorer/rubric.md`
