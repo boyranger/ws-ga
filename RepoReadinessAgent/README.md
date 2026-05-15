@@ -151,7 +151,16 @@ PYTHONPATH=src python3 -m repo_readiness_agent.cli inspect https://github.com/pa
 PYTHONPATH=src python3 -m repo_readiness_agent.cli inspect https://github.com/pallets/flask --format json
 ```
 
-### 3. Run follow-up comparison
+### 3. Export hasil ke PDF bahasa Indonesia
+
+```bash
+PYTHONPATH=src python3 -m repo_readiness_agent.cli inspect \
+  https://github.com/pallets/flask \
+  --format pdf \
+  --output examples/sample_outputs/flask_product_report_id.pdf
+```
+
+### 4. Run follow-up comparison
 
 ```bash
 PYTHONPATH=src python3 -m repo_readiness_agent.cli followup \
@@ -246,6 +255,9 @@ Local run references:
 pip install -r requirements-bot.txt
 REPO_READINESS_TELEGRAM_BOT_TOKEN=... PYTHONPATH=src python3 -m repo_readiness_agent.bot.app
 PYTHONPATH=src python3 -m repo_readiness_agent.bot.runner
+
+# export PDF founder-facing
+PYTHONPATH=src python3 -m repo_readiness_agent.cli inspect <github_url> --format pdf --output report.pdf
 ```
 
 Use `.env.example` and `docs/public_telegram_bot_runbook.md` for local setup.

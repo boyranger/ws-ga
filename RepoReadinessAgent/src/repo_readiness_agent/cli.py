@@ -10,6 +10,7 @@ from .contract import load_product_report, product_report_to_json
 from .engine import build_product_report, run_engine
 from .followup import build_follow_up
 from .formatter import render_text_report
+from .pdf_export import export_report_to_pdf
 
 
 def parse_args() -> argparse.Namespace:
@@ -22,14 +23,16 @@ def parse_args() -> argparse.Namespace:
     inspect_parser.add_argument("--subdir", default=None, help="Optional repository subdirectory to inspect")
     inspect_parser.add_argument("--strictness", choices=["relaxed", "balanced", "strict"], default="balanced")
     inspect_parser.add_argument("--language-hint", default=None, help="Override detected dominant language label")
-    inspect_parser.add_argument("--format", choices=["text", "json", "both"], default="text")
+    inspect_parser.add_argument("--format", choices=["text", "json", "both", "pdf"], default="text")
+    inspect_parser.add_argument("--output", default=None, help="Path output file, required for PDF export")
 
     followup_parser = subparsers.add_parser("followup", help="Compare two product-layer JSON reports")
     followup_parser.add_argument("before", help="Path to the earlier product-layer JSON report")
     followup_parser.add_argument("after", help="Path to the later product-layer JSON report")
     followup_parser.add_argument("--target-stage", default="Handoff-ready", help="Target stage for stop-condition evaluation")
     followup_parser.add_argument("--target-confidence", default="High", help="Target confidence for stop-condition evaluation")
-    followup_parser.add_argument("--format", choices=["text", "json", "both"], default="text")
+    followup_parser.add_argument("--format", choices=["text", "json", "both", "pdf"], default="text")
+    followup_parser.add_argument("--output", default=None, help="Path output file, required for PDF export")
 
     return parser.parse_args()
 
@@ -50,6 +53,11 @@ def run_inspect(args: argparse.Namespace) -> int:
         print(render_text_report(product_report))
         print("\n--- JSON ---")
         print(product_report_to_json(product_report))
+    elif args.format == "pdf":
+        if not args.output:
+            raise ValueError("--output wajib diberikan saat memakai --format pdf")
+        output = export_report_to_pdf(product_report, args.output, repo_label=args.repo)
+        print(output)
     else:
         print(render_text_report(product_report))
     return 0
@@ -71,6 +79,11 @@ def run_followup(args: argparse.Namespace) -> int:
         print(render_text_report(after))
         print("\n--- JSON ---")
         print(product_report_to_json(after))
+    elif args.format == "pdf":
+        if not args.output:
+            raise ValueError("--output wajib diberikan saat memakai --format pdf")
+        output = export_report_to_pdf(after, args.output)
+        print(output)
     else:
         print(render_text_report(after))
     return 0

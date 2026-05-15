@@ -4,6 +4,7 @@ from .contract import FollowUpStatus, FounderGates, ProductReport
 from .engine import build_product_report, derive_founder_gates, run_engine
 from .followup import build_follow_up
 from .formatter import render_text_report
+from .pdf_export import export_report_to_pdf
 
 __all__ = [
     "FollowUpStatus",
@@ -14,4 +15,5 @@ __all__ = [
     "build_product_report",
     "build_follow_up",
     "render_text_report",
+    "export_report_to_pdf",
 ]
