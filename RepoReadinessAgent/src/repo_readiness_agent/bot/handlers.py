@@ -125,12 +125,12 @@ async def report_handler(update: Any, context: Any) -> None:
     user_id, username, first_name, last_name = _telegram_user_parts(update)
     service: RepoTrackingService = context.application.bot_data["repo_tracking_service"]
     if not context.args:
-        await update.effective_message.reply_text("Usage: /report <tracking_id>")
+        await update.effective_message.reply_text("Cara pakai: /report <tracking_id>")
         return
     try:
         tracking_id = int(context.args[0])
     except ValueError:
-        await update.effective_message.reply_text("Tracking ID must be a number.")
+        await update.effective_message.reply_text("Tracking ID harus berupa angka.")
         return
     try:
         tracked_repo, report = service.get_report_for_tracking(
@@ -153,12 +153,12 @@ async def followup_handler(update: Any, context: Any) -> None:
     user_id, username, first_name, last_name = _telegram_user_parts(update)
     service: RepoTrackingService = context.application.bot_data["repo_tracking_service"]
     if not context.args:
-        await update.effective_message.reply_text("Usage: /followup <tracking_id>")
+        await update.effective_message.reply_text("Cara pakai: /followup <tracking_id>")
         return
     try:
         tracking_id = int(context.args[0])
     except ValueError:
-        await update.effective_message.reply_text("Tracking ID must be a number.")
+        await update.effective_message.reply_text("Tracking ID harus berupa angka.")
         return
     try:
         result = service.run_followup_for_tracking(
@@ -181,12 +181,12 @@ async def untrack_handler(update: Any, context: Any) -> None:
     user_id, username, first_name, last_name = _telegram_user_parts(update)
     service: RepoTrackingService = context.application.bot_data["repo_tracking_service"]
     if not context.args:
-        await update.effective_message.reply_text("Usage: /untrack <tracking_id>")
+        await update.effective_message.reply_text("Cara pakai: /untrack <tracking_id>")
         return
     try:
         tracking_id = int(context.args[0])
     except ValueError:
-        await update.effective_message.reply_text("Tracking ID must be a number.")
+        await update.effective_message.reply_text("Tracking ID harus berupa angka.")
         return
     try:
         tracked = service.disable_tracking(

@@ -55,7 +55,7 @@ class RepoTrackingService:
         candidate = repo_url.strip()
         match = _GITHUB_REPO_RE.match(candidate)
         if not match:
-            raise ValidationError("Only GitHub repository URLs are supported right now. Use format: https://github.com/owner/repo")
+            raise ValidationError("Saat ini bot hanya mendukung URL repository GitHub. Gunakan format: https://github.com/owner/repo")
         owner = match.group("owner")
         repo = match.group("repo")
         return f"https://github.com/{owner}/{repo}"
@@ -174,7 +174,7 @@ class RepoTrackingService:
         with self.database.connect() as connection:
             tracked_repo = repo_db.get_tracked_repo_for_user(connection, user_id=user.id, tracking_id=tracking_id)
             if not tracked_repo:
-                raise NotFoundError("Tracking record not found.")
+                raise NotFoundError("Data tracking tidak ditemukan.")
             repo_db.archive_tracking(connection, tracked_repository_id=tracked_repo.id)
             connection.commit()
             refreshed = repo_db.get_tracked_repo_for_user(connection, user_id=user.id, tracking_id=tracking_id)
@@ -194,10 +194,10 @@ class RepoTrackingService:
         with self.database.connect() as connection:
             tracked_repo = repo_db.get_tracked_repo_for_user(connection, user_id=user.id, tracking_id=tracking_id)
             if not tracked_repo:
-                raise NotFoundError("Tracking record not found.")
+                raise NotFoundError("Data tracking tidak ditemukan.")
             latest = repo_db.get_latest_report_for_repo(connection, tracked_repository_id=tracked_repo.id)
             if not latest:
-                raise NotFoundError("No report has been saved for that tracking record yet.")
+                raise NotFoundError("Belum ada report yang tersimpan untuk data tracking itu.")
             return tracked_repo, product_report_from_dict(json.loads(latest.report_json))
 
     def run_followup_for_tracking(
@@ -215,10 +215,10 @@ class RepoTrackingService:
         with self.database.connect() as connection:
             tracked_repo = repo_db.get_tracked_repo_for_user(connection, user_id=user.id, tracking_id=tracking_id)
             if not tracked_repo:
-                raise NotFoundError("Tracking record not found.")
+                raise NotFoundError("Data tracking tidak ditemukan.")
             latest_record = repo_db.get_latest_report_for_repo(connection, tracked_repository_id=tracked_repo.id)
             if not latest_record:
-                raise NotFoundError("No previous report exists yet. Use /inspect first.")
+                raise NotFoundError("Belum ada report sebelumnya. Jalankan /inspect dulu.")
             previous_report = product_report_from_dict(json.loads(latest_record.report_json))
 
         inspect_result = self.inspect_repo(
