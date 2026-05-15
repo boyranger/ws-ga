@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 from pathlib import Path
 
@@ -21,6 +22,8 @@ from .storage import Database
 
 DEFAULT_DB_PATH = Path(__file__).resolve().parents[3] / "data" / "repo_readiness_agent.sqlite3"
 
+logger = logging.getLogger(__name__)
+
 BOT_COMMANDS = [
     ("start", "Mulai dan lihat pengantar bot"),
     ("help", "Lihat daftar command"),
@@ -36,6 +39,16 @@ BOT_COMMANDS = [
 def build_service() -> RepoTrackingService:
     db_path = Path(os.getenv("REPO_READINESS_DB_PATH", DEFAULT_DB_PATH))
     return RepoTrackingService(Database(db_path))
+
+
+async def _error_handler(update: object, context: object) -> None:
+    logger.exception("Unhandled Telegram bot error", exc_info=getattr(context, "error", None))
+    try:
+        message = getattr(update, "effective_message", None)
+        if message is not None:
+            await message.reply_text("Maaf, terjadi error saat memproses pesanmu. Coba lagi dengan pesan yang lebih singkat atau command yang lebih spesifik.")
+    except Exception:
+        logger.exception("Failed to send Telegram error fallback")
 
 
 def main() -> None:
@@ -56,6 +69,8 @@ def main() -> None:
             [BotCommand(command=name, description=description) for name, description in BOT_COMMANDS]
         )
 
+    logging.basicConfig(level=logging.INFO)
+
     application = Application.builder().token(token).post_init(_post_init).build()
     application.bot_data["repo_tracking_service"] = build_service()
 
@@ -68,6 +83,7 @@ def main() -> None:
     application.add_handler(CommandHandler("followup", followup_handler))
     application.add_handler(CommandHandler("untrack", untrack_handler))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, conversational_message_handler))
+    application.add_error_handler(_error_handler)
 
     application.run_polling()
 
