@@ -10,6 +10,9 @@ Deliver a clear, demoable hackathon version of **Repo Readiness Agent** that is 
 - output language
 - demo flow
 
+For the more operational execution guide with owners, dependencies, and completion criteria, see `docs/hackathon_implementation_plan.md`.
+
+
 ---
 
 ## Team
