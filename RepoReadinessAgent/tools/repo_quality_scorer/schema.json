@@ -1,0 +1,197 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://docs.openclaw.ai/schemas/repo_quality_scorer/report.schema.json",
+  "title": "repo_quality_scorer report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "repo",
+    "local_path",
+    "confidence",
+    "verdict",
+    "maturity_level",
+    "code_quality_score",
+    "production_readiness_score",
+    "breakdown",
+    "strengths",
+    "risks",
+    "red_flags",
+    "top_improvements",
+    "inputs",
+    "facts"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "Output contract version for repo_quality_scorer JSON reports."
+    },
+    "repo": {
+      "type": "string"
+    },
+    "local_path": {
+      "type": "string"
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["Low", "Medium", "High"]
+    },
+    "verdict": {
+      "type": "string"
+    },
+    "maturity_level": {
+      "type": "string",
+      "enum": ["Prototype", "MVP", "Maturing", "Production-capable"]
+    },
+    "code_quality_score": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 10
+    },
+    "production_readiness_score": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 10
+    },
+    "breakdown": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "architecture",
+        "code_quality",
+        "security",
+        "testing",
+        "documentation",
+        "production_readiness"
+      ],
+      "properties": {
+        "architecture": { "type": "number", "minimum": 1, "maximum": 10 },
+        "code_quality": { "type": "number", "minimum": 1, "maximum": 10 },
+        "security": { "type": "number", "minimum": 1, "maximum": 10 },
+        "testing": { "type": "number", "minimum": 1, "maximum": 10 },
+        "documentation": { "type": "number", "minimum": 1, "maximum": 10 },
+        "production_readiness": { "type": "number", "minimum": 1, "maximum": 10 }
+      }
+    },
+    "strengths": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "risks": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "red_flags": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "top_improvements": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repo", "branch", "subdir", "strictness", "language_hint", "output_format"],
+      "properties": {
+        "repo": { "type": "string" },
+        "branch": { "type": ["string", "null"] },
+        "subdir": { "type": ["string", "null"] },
+        "strictness": { "type": "string", "enum": ["relaxed", "balanced", "strict"] },
+        "language_hint": { "type": ["string", "null"] },
+        "output_format": { "type": "string", "enum": ["text", "json", "both"] }
+      }
+    },
+    "facts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repo",
+        "local_path",
+        "branch",
+        "files_total",
+        "source_files",
+        "test_files",
+        "doc_files",
+        "has_readme",
+        "has_ci",
+        "has_docker",
+        "has_env_example",
+        "has_migrations",
+        "has_healthcheck",
+        "has_lockfile",
+        "has_tests",
+        "has_package_json",
+        "has_pyproject",
+        "has_go_mod",
+        "dominant_language",
+        "languages",
+        "max_file_lines",
+        "top_large_files",
+        "debug_hits",
+        "security_hits",
+        "secret_hits",
+        "entrypoint_hits",
+        "analyzer"
+      ],
+      "properties": {
+        "repo": { "type": "string" },
+        "local_path": { "type": "string" },
+        "branch": { "type": ["string", "null"] },
+        "files_total": { "type": "integer", "minimum": 0 },
+        "source_files": { "type": "integer", "minimum": 0 },
+        "test_files": { "type": "integer", "minimum": 0 },
+        "doc_files": { "type": "integer", "minimum": 0 },
+        "has_readme": { "type": "boolean" },
+        "has_ci": { "type": "boolean" },
+        "has_docker": { "type": "boolean" },
+        "has_env_example": { "type": "boolean" },
+        "has_migrations": { "type": "boolean" },
+        "has_healthcheck": { "type": "boolean" },
+        "has_lockfile": { "type": "boolean" },
+        "has_tests": { "type": "boolean" },
+        "has_package_json": { "type": "boolean" },
+        "has_pyproject": { "type": "boolean" },
+        "has_go_mod": { "type": "boolean" },
+        "dominant_language": { "type": "string" },
+        "languages": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "max_file_lines": { "type": "integer", "minimum": 0 },
+        "top_large_files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "lines"],
+            "properties": {
+              "path": { "type": "string" },
+              "lines": { "type": "integer", "minimum": 0 }
+            }
+          }
+        },
+        "debug_hits": { "type": "integer", "minimum": 0 },
+        "security_hits": { "type": "integer", "minimum": 0 },
+        "secret_hits": { "type": "integer", "minimum": 0 },
+        "entrypoint_hits": { "type": "integer", "minimum": 0 },
+        "analyzer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "applied", "status", "summary", "exit_code", "signals"],
+          "properties": {
+            "name": { "type": ["string", "null"] },
+            "applied": { "type": "boolean" },
+            "status": { "type": "string" },
+            "summary": { "type": ["string", "null"] },
+            "exit_code": { "type": ["integer", "null"] },
+            "signals": {
+              "type": ["object", "null"],
+              "additionalProperties": { "type": "integer" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
