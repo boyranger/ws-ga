@@ -109,12 +109,15 @@ For the more operational execution guide with owners, dependencies, and completi
 - presentation narrative
 - judging-angle refinement
 - choose what to show in demo
+- approve the final visible product wording
+- own the live explanation of autonomy and founder value
 
 ### Fauzi
 - run checks in parallel
 - validate outputs on sample repos
 - help test any changed implementation
 - help reduce demo friction
+- own scorer output alignment and verification
 
 ### Clara
 - maintain scope guardrails
@@ -122,6 +125,31 @@ For the more operational execution guide with owners, dependencies, and completi
 - refine wording
 - support implementation review
 - keep all outputs aligned with the product story
+
+---
+
+## Clear assignment by person
+
+### Mahdy owns
+- product framing
+- final wording approval
+- primary + backup demo repo choice
+- pitch clarity
+- autonomy explanation
+- founder-value explanation
+
+### Fauzi owns
+- scorer output updates
+- text/json verification
+- sample run execution
+- demo reliability checks
+- blocker reporting
+
+### Shared checkpoint
+Before final demo prep, Mahdy and Fauzi should align on only 3 things:
+1. the exact visible stage labels
+2. the exact visible output sections
+3. the exact demo repo to present
 
 ---
 

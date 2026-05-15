@@ -294,6 +294,85 @@ Focus on:
 
 ---
 
+## Tonight's concrete assignment
+
+### Mahdy - owner of product story and demo
+
+Mahdy should own the parts that require judgment, positioning, and presentation confidence.
+
+#### Mahdy must finish
+- [ ] lock the final product wording:
+  - Repo Readiness Agent
+  - Prototype / MVP / Handoff-ready
+  - founder-facing framing
+- [ ] choose the **primary demo repo**
+- [ ] choose the **backup demo repo**
+- [ ] approve the final visible output wording
+- [ ] prepare the spoken answers for:
+  - why this is autonomous
+  - why one agent is enough
+  - why this matters for founders
+- [ ] rehearse:
+  - 30-second pitch
+  - 2-minute demo story
+
+#### Mahdy deliverables tonight
+- one approved product narrative
+- one primary demo choice
+- one backup demo choice
+- one short spoken pitch
+- one clear autonomy explanation
+
+### Fauzi - owner of implementation and verification
+
+Fauzi should own the parts that require editing, running, validating, and de-risking the product behavior.
+
+#### Fauzi must finish
+- [ ] update `tools/repo_quality_scorer/repo_quality_scorer.py` so output emphasizes:
+  - stage
+  - verdict
+  - top risks
+  - top 3 fixes
+- [ ] align outward maturity labels to:
+  - Prototype
+  - MVP
+  - Handoff-ready
+- [ ] add or prepare wording for:
+  - Demo-safe?
+  - Launch-ready?
+  - Handoff-ready?
+  - Confidence
+- [ ] run at least one real sample repo in text mode
+- [ ] run at least one real sample repo in JSON mode
+- [ ] flag any blocker that breaks demo reliability
+- [ ] capture one stable sample output for Mahdy to present
+
+#### Fauzi deliverables tonight
+- updated scorer behavior
+- verified text output
+- verified JSON output
+- one stable demo result
+- one short list of blockers, if any remain
+
+### Hand-off between Mahdy and Fauzi
+
+To stay parallel without drifting:
+- Mahdy decides **what story must be told**
+- Fauzi ensures **the implementation output can tell that story cleanly**
+- Mahdy should not wait for perfect implementation before refining the pitch
+- Fauzi should not invent product language without checking Mahdy's approved framing
+
+### Fast working protocol
+
+1. Mahdy locks wording and demo repo choice
+2. Fauzi updates output to match that wording
+3. Fauzi sends sample output
+4. Mahdy reviews it from a judge/demo perspective
+5. Fauzi fixes only the gaps that affect clarity or reliability
+6. both stop expanding once the demo story is coherent
+
+---
+
 ## Suggested sequence by priority
 
 ### Priority 1
