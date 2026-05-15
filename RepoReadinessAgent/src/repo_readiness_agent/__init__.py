@@ -1,7 +1,8 @@
 """Repo Readiness Agent product package."""
 
 from .contract import FollowUpStatus, FounderGates, ProductReport
-from .engine import build_follow_up, build_product_report, derive_founder_gates, run_engine
+from .engine import build_product_report, derive_founder_gates, run_engine
+from .followup import build_follow_up
 from .formatter import render_text_report
 
 __all__ = [

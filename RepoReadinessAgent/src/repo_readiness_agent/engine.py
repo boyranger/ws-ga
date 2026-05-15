@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from .contract import FollowUpStatus, FounderGates, ProductReport
+from .contract import FounderGates, ProductReport
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
 REPO_ROOT = PACKAGE_ROOT.parent.parent
@@ -73,33 +73,3 @@ def build_product_report(score_report: dict[str, Any]) -> ProductReport:
         top_fixes=fixes,
         gates=derive_founder_gates(score_report),
     )
-
-
-def build_follow_up(
-    previous_report: ProductReport,
-    latest_report: ProductReport,
-    *,
-    target_stage: str = "Handoff-ready",
-    target_confidence: str = "High",
-) -> FollowUpStatus:
-    stage_order = {"Prototype": 1, "MVP": 2, "Handoff-ready": 3}
-    confidence_order = {"Low": 1, "Medium": 2, "High": 3}
-
-    previous_stage = stage_order.get(previous_report.stage, 0)
-    latest_stage = stage_order.get(latest_report.stage, 0)
-    previous_confidence = confidence_order.get(previous_report.confidence, 0)
-    latest_confidence = confidence_order.get(latest_report.confidence, 0)
-
-    if latest_stage > previous_stage or latest_confidence > previous_confidence:
-        status = "Improved"
-    elif latest_stage == previous_stage and latest_confidence == previous_confidence:
-        status = "Unchanged"
-    else:
-        status = "Still blocked"
-
-    stop_condition = "Target reached" if (
-        latest_report.stage == target_stage
-        and confidence_order.get(latest_report.confidence, 0) >= confidence_order.get(target_confidence, 0)
-    ) else "Keep monitoring"
-
-    return FollowUpStatus(status=status, stop_condition=stop_condition)
