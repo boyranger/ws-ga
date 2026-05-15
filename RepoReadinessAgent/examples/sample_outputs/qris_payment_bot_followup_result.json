@@ -1,0 +1,10 @@
+{
+  "before_stage": "Prototype",
+  "after_stage": "MVP",
+  "before_confidence": "Low",
+  "after_confidence": "Medium",
+  "follow_up": {
+    "status": "Improved",
+    "stop_condition": "Keep monitoring"
+  }
+}
