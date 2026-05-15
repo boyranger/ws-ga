@@ -26,6 +26,8 @@ The tool must produce:
 
 - **Code Quality Score**
 - **Production Readiness Score**
+- **Maturity Level**
+- **Verdict**
 - per-dimension breakdown
 - evidence-backed reasoning
 - key risks and improvement priorities
@@ -50,7 +52,7 @@ Optional input:
 - branch
 - commit / ref
 - subdirectory
-- scoring strictness
+- scoring strictness (`relaxed`, `balanced`, `strict`)
 - language hint
 - output format (`text`, `json`, or both)
 
@@ -61,6 +63,8 @@ Human-readable output should include:
 - repository URL
 - code quality score
 - production readiness score
+- maturity level
+- verdict
 - confidence level
 - per-dimension scores
 - strengths
@@ -100,7 +104,7 @@ Top improvements:
 3. ...
 ```
 
-Machine-readable output should expose the same fields in JSON.
+Machine-readable output should expose the same fields in JSON, including the input parameters used for the scoring run.
 
 ## Non-Goals for v1
 

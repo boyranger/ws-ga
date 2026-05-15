@@ -9,6 +9,8 @@
     "repo",
     "local_path",
     "confidence",
+    "verdict",
+    "maturity_level",
     "code_quality_score",
     "production_readiness_score",
     "breakdown",
@@ -16,6 +18,7 @@
     "risks",
     "red_flags",
     "top_improvements",
+    "inputs",
     "facts"
   ],
   "properties": {
@@ -32,6 +35,13 @@
     "confidence": {
       "type": "string",
       "enum": ["Low", "Medium", "High"]
+    },
+    "verdict": {
+      "type": "string"
+    },
+    "maturity_level": {
+      "type": "string",
+      "enum": ["Prototype", "MVP", "Maturing", "Production-capable"]
     },
     "code_quality_score": {
       "type": "number",
@@ -78,6 +88,19 @@
     "top_improvements": {
       "type": "array",
       "items": { "type": "string" }
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repo", "branch", "subdir", "strictness", "language_hint", "output_format"],
+      "properties": {
+        "repo": { "type": "string" },
+        "branch": { "type": ["string", "null"] },
+        "subdir": { "type": ["string", "null"] },
+        "strictness": { "type": "string", "enum": ["relaxed", "balanced", "strict"] },
+        "language_hint": { "type": ["string", "null"] },
+        "output_format": { "type": "string", "enum": ["text", "json", "both"] }
+      }
     },
     "facts": {
       "type": "object",
@@ -154,19 +177,19 @@
         "entrypoint_hits": { "type": "integer", "minimum": 0 },
         "analyzer": {
           "type": "object",
-          "required": ["name", "applied", "status", "summary"],
+          "additionalProperties": false,
+          "required": ["name", "applied", "status", "summary", "exit_code", "signals"],
           "properties": {
             "name": { "type": ["string", "null"] },
             "applied": { "type": "boolean" },
             "status": { "type": "string" },
             "summary": { "type": ["string", "null"] },
-            "exit_code": { "type": "integer" },
+            "exit_code": { "type": ["integer", "null"] },
             "signals": {
-              "type": "object",
+              "type": ["object", "null"],
               "additionalProperties": { "type": "integer" }
             }
-          },
-          "additionalProperties": true
+          }
         }
       }
     }

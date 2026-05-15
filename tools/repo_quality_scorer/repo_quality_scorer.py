@@ -10,11 +10,11 @@ import subprocess
 import sys
 import tempfile
 from collections import Counter
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
-SCHEMA_VERSION = "1.0.0"
+SCHEMA_VERSION = "1.1.0"
 
 ROOT = Path(__file__).resolve().parent
 WORKSPACE = ROOT.parent.parent
@@ -40,6 +40,7 @@ PLACEHOLDER_SECRET_MARKERS = (
     "<api_key>",
     "<token>",
     "<secret>",
+    "***",
 )
 SKIP_DIRS = {
     ".git", "node_modules", ".venv", "venv", "dist", "build", "target", "coverage", ".next",
@@ -70,6 +71,21 @@ DEBUG_PATTERNS = [
     re.compile(r"TODO"),
     re.compile(r"FIXME"),
 ]
+STRICTNESS_FACTORS = {
+    "relaxed": 0.85,
+    "balanced": 1.0,
+    "strict": 1.2,
+}
+
+
+@dataclass
+class AnalyzerInfo:
+    name: str | None
+    applied: bool
+    status: str
+    summary: str | None
+    exit_code: int | None = None
+    signals: dict[str, int] | None = None
 
 
 @dataclass
@@ -100,7 +116,17 @@ class RepoFacts:
     security_hits: int
     secret_hits: int
     entrypoint_hits: int
-    analyzer: dict[str, Any]
+    analyzer: AnalyzerInfo
+
+
+@dataclass
+class ScoreInputs:
+    repo: str
+    branch: str | None
+    subdir: str | None
+    strictness: str
+    language_hint: str | None
+    output_format: str
 
 
 @dataclass
@@ -109,6 +135,8 @@ class ScoreReport:
     repo: str
     local_path: str
     confidence: str
+    verdict: str
+    maturity_level: str
     code_quality_score: float
     production_readiness_score: float
     breakdown: dict[str, float]
@@ -116,6 +144,7 @@ class ScoreReport:
     risks: list[str]
     red_flags: list[str]
     top_improvements: list[str]
+    inputs: ScoreInputs
     facts: RepoFacts
 
 
@@ -156,11 +185,7 @@ def detect_language_from_name(name: str) -> str | None:
 
 
 def should_scan_text(path: Path) -> bool:
-    if path.suffix.lower() in TEXT_EXTENSIONS:
-        return True
-    if path.name in {"Dockerfile", ".env.example"}:
-        return True
-    return False
+    return path.suffix.lower() in TEXT_EXTENSIONS or path.name in {"Dockerfile", ".env.example"}
 
 
 def should_scan_code_patterns(path: Path) -> bool:
@@ -168,9 +193,7 @@ def should_scan_code_patterns(path: Path) -> bool:
 
 
 def should_scan_config_patterns(path: Path) -> bool:
-    if path.name == ".env.example":
-        return True
-    return path.suffix.lower() in CONFIG_SCAN_EXTENSIONS
+    return path.name == ".env.example" or path.suffix.lower() in CONFIG_SCAN_EXTENSIONS
 
 
 def looks_like_placeholder_secret(value: str) -> bool:
@@ -178,7 +201,20 @@ def looks_like_placeholder_secret(value: str) -> bool:
     return any(marker in lowered for marker in PLACEHOLDER_SECRET_MARKERS)
 
 
-def walk_repo(repo_path: Path) -> tuple[RepoFacts, list[str], list[str], list[str]]:
+def resolve_repo_path(repo_path: Path, subdir: str | None) -> Path:
+    if not subdir:
+        return repo_path
+    resolved = (repo_path / subdir).resolve()
+    try:
+        resolved.relative_to(repo_path.resolve())
+    except ValueError as exc:
+        raise ValueError(f"subdir escapes repository root: {subdir}") from exc
+    if not resolved.exists() or not resolved.is_dir():
+        raise FileNotFoundError(f"Subdirectory not found in repo: {subdir}")
+    return resolved
+
+
+def walk_repo(repo_path: Path, repo_label: str, branch: str | None, language_hint: str | None) -> RepoFacts:
     language_counter: Counter[str] = Counter()
     files_total = 0
     source_files = 0
@@ -190,9 +226,6 @@ def walk_repo(repo_path: Path) -> tuple[RepoFacts, list[str], list[str], list[st
     entrypoint_hits = 0
     max_file_lines = 0
     top_large_files: list[dict[str, Any]] = []
-    strengths: list[str] = []
-    risks: list[str] = []
-    red_flags: list[str] = []
 
     has_readme = False
     has_ci = False
@@ -283,14 +316,12 @@ def walk_repo(repo_path: Path) -> tuple[RepoFacts, list[str], list[str], list[st
                         secret_hits += 1
 
     top_large_files = sorted(top_large_files, key=lambda item: item["lines"], reverse=True)[:10]
-    dominant_language = language_counter.most_common(1)[0][0] if language_counter else "Unknown"
+    dominant_language = language_hint or (language_counter.most_common(1)[0][0] if language_counter else "Unknown")
 
-    analyzer = {"name": None, "applied": False, "status": "skipped", "summary": None}
-
-    facts = RepoFacts(
-        repo="",
+    return RepoFacts(
+        repo=repo_label,
         local_path=str(repo_path),
-        branch=None,
+        branch=branch,
         files_total=files_total,
         source_files=source_files,
         test_files=test_files,
@@ -314,44 +345,47 @@ def walk_repo(repo_path: Path) -> tuple[RepoFacts, list[str], list[str], list[st
         security_hits=security_hits,
         secret_hits=secret_hits,
         entrypoint_hits=entrypoint_hits,
-        analyzer=analyzer,
+        analyzer=AnalyzerInfo(name=None, applied=False, status="skipped", summary=None),
     )
-    return facts, strengths, risks, red_flags
 
 
-def maybe_run_backbone(repo_path: Path, facts: RepoFacts) -> dict[str, Any]:
-    if not (facts.has_package_json or facts.has_go_mod):
-        return {"name": "code-quality-check", "applied": False, "status": "skipped", "summary": "ecosystem not applicable in v1"}
+def maybe_run_backbone(repo_path: Path, facts: RepoFacts) -> AnalyzerInfo:
+    detected_js_like = facts.has_package_json or facts.has_go_mod or facts.dominant_language in {"JavaScript", "TypeScript", "Go"}
+    if not detected_js_like:
+        return AnalyzerInfo(name="code-quality-check", applied=False, status="skipped", summary="ecosystem not applicable in v1")
 
     tool_repo = Path("/tmp/code-quality-check")
     if not tool_repo.exists():
-        return {"name": "code-quality-check", "applied": False, "status": "missing", "summary": "backbone repo not available locally"}
+        return AnalyzerInfo(name="code-quality-check", applied=False, status="missing", summary="backbone repo not available locally")
 
     try:
         result = run(["node", str(tool_repo / "bin" / "code-quality.js")], cwd=str(repo_path), check=False)
         combined = (result.stdout or "") + ("\n" + result.stderr if result.stderr else "")
-        red_count = combined.count("[Code Quality]") and combined.lower().count("failed")
-        return {
-            "name": "code-quality-check",
-            "applied": True,
-            "status": "pass" if result.returncode == 0 else "warn",
-            "exit_code": result.returncode,
-            "summary": combined[-4000:],
-            "signals": {
+        return AnalyzerInfo(
+            name="code-quality-check",
+            applied=True,
+            status="pass" if result.returncode == 0 else "warn",
+            exit_code=result.returncode,
+            summary=combined[-4000:] or None,
+            signals={
                 "failed_mentions": combined.lower().count("failed"),
                 "warn_mentions": combined.lower().count("warn"),
                 "pass_mentions": combined.lower().count("pass"),
             },
-        }
+        )
     except Exception as exc:
-        return {"name": "code-quality-check", "applied": True, "status": "error", "summary": str(exc)}
+        return AnalyzerInfo(name="code-quality-check", applied=True, status="error", summary=str(exc))
 
 
 def clamp(value: float, low: float = 1.0, high: float = 10.0) -> float:
     return round(max(low, min(high, value)), 1)
 
 
-def score_architecture(facts: RepoFacts) -> float:
+def strict_penalty(amount: float, strictness: str) -> float:
+    return amount * STRICTNESS_FACTORS[strictness]
+
+
+def score_architecture(facts: RepoFacts, strictness: str) -> float:
     score = 5.5
     if facts.source_files >= 8:
         score += 1.0
@@ -362,50 +396,50 @@ def score_architecture(facts: RepoFacts) -> float:
     if facts.entrypoint_hits >= 2:
         score += 0.5
     if facts.max_file_lines > 800:
-        score -= 1.0
+        score -= strict_penalty(1.0, strictness)
     elif facts.max_file_lines > 500:
-        score -= 0.6
+        score -= strict_penalty(0.6, strictness)
     if len(facts.top_large_files) >= 5:
-        score -= 0.7
+        score -= strict_penalty(0.7, strictness)
     return clamp(score)
 
 
-def score_code_quality(facts: RepoFacts) -> float:
+def score_code_quality(facts: RepoFacts, strictness: str) -> float:
     score = 6.0
     if facts.has_lockfile:
         score += 0.4
     if facts.debug_hits > 0:
-        score -= min(1.5, facts.debug_hits * 0.1)
-    if facts.analyzer.get("applied"):
-        if facts.analyzer.get("status") == "pass":
+        score -= min(1.5, strict_penalty(facts.debug_hits * 0.1, strictness))
+    if facts.analyzer.applied:
+        if facts.analyzer.status == "pass":
             score += 0.8
-        elif facts.analyzer.get("status") == "warn":
-            score -= 0.8
-        elif facts.analyzer.get("status") == "error":
-            score -= 0.5
+        elif facts.analyzer.status == "warn":
+            score -= strict_penalty(0.8, strictness)
+        elif facts.analyzer.status == "error":
+            score -= strict_penalty(0.5, strictness)
     if facts.max_file_lines > 600:
-        score -= 0.5
+        score -= strict_penalty(0.5, strictness)
     return clamp(score)
 
 
-def score_security(facts: RepoFacts) -> float:
+def score_security(facts: RepoFacts, strictness: str) -> float:
     score = 6.2
     if facts.has_env_example:
         score += 0.6
     if facts.secret_hits > 0:
-        score -= min(3.5, facts.secret_hits * 1.8)
+        score -= min(3.5, strict_penalty(facts.secret_hits * 1.8, strictness))
     if facts.security_hits > 0:
-        score -= min(2.5, facts.security_hits * 0.7)
+        score -= min(2.5, strict_penalty(facts.security_hits * 0.7, strictness))
     if not facts.has_env_example and (facts.has_package_json or facts.has_pyproject or facts.has_go_mod):
-        score -= 0.5
+        score -= strict_penalty(0.5, strictness)
     if facts.has_ci:
         score += 0.2
     return clamp(score)
 
 
-def score_testing(facts: RepoFacts) -> float:
+def score_testing(facts: RepoFacts, strictness: str) -> float:
     if not facts.has_tests:
-        return 2.0
+        return clamp(2.0 - (0.4 if strictness == "strict" else 0.0))
     score = 3.5
     if facts.test_files >= 1:
         score += 0.8
@@ -417,12 +451,14 @@ def score_testing(facts: RepoFacts) -> float:
         score += 1.0
     if facts.test_files >= max(3, facts.source_files // 3):
         score += 0.8
+    if strictness == "strict" and facts.test_files < max(2, facts.source_files // 5):
+        score -= 0.4
     return clamp(score)
 
 
-def score_documentation(facts: RepoFacts) -> float:
+def score_documentation(facts: RepoFacts, strictness: str) -> float:
     if not facts.has_readme:
-        return 3.0
+        return clamp(3.0 - (0.3 if strictness == "strict" else 0.0))
     score = 5.8
     if facts.doc_files >= 3:
         score += 1.0
@@ -435,7 +471,7 @@ def score_documentation(facts: RepoFacts) -> float:
     return clamp(score)
 
 
-def score_production_readiness(facts: RepoFacts) -> float:
+def score_production_readiness(facts: RepoFacts, strictness: str) -> float:
     score = 4.8
     if facts.has_ci:
         score += 1.3
@@ -452,9 +488,11 @@ def score_production_readiness(facts: RepoFacts) -> float:
     if facts.has_tests:
         score += 0.3
     else:
-        score -= 1.0
+        score -= strict_penalty(1.0, strictness)
     if facts.secret_hits > 0:
-        score -= 1.2
+        score -= min(2.0, strict_penalty(1.2, strictness))
+    if strictness == "strict" and not facts.has_ci:
+        score -= 0.5
     return clamp(score)
 
 
@@ -464,7 +502,7 @@ def confidence_for(facts: RepoFacts) -> str:
     evidence += 1 if facts.source_files > 0 else 0
     evidence += 1 if facts.has_tests else 0
     evidence += 1 if facts.has_ci else 0
-    evidence += 1 if facts.analyzer.get("applied") else 0
+    evidence += 1 if facts.analyzer.applied else 0
     evidence += 1 if facts.has_env_example else 0
     if evidence >= 5:
         return "High"
@@ -473,7 +511,20 @@ def confidence_for(facts: RepoFacts) -> str:
     return "Low"
 
 
-def synthesize_notes(facts: RepoFacts, breakdown: dict[str, float]) -> tuple[list[str], list[str], list[str], list[str]]:
+def classify_report(code_quality_score: float, production_readiness_score: float) -> tuple[str, str]:
+    combined = round((code_quality_score + production_readiness_score) / 2, 1)
+    floor = min(code_quality_score, production_readiness_score)
+
+    if combined >= 8.5 and floor >= 8.0:
+        return "Production-capable", "Strong production posture with good engineering discipline."
+    if combined >= 7.2 and floor >= 6.5:
+        return "Maturing", "Promising repository with meaningful quality signals, but still needs hardening."
+    if combined >= 5.5 and floor >= 4.5:
+        return "MVP", "Usable foundation, though several quality or operational gaps still need attention."
+    return "Prototype", "Early-stage repository with notable quality or readiness gaps."
+
+
+def synthesize_notes(facts: RepoFacts, breakdown: dict[str, float], strictness: str) -> tuple[list[str], list[str], list[str], list[str]]:
     strengths: list[str] = []
     risks: list[str] = []
     red_flags: list[str] = []
@@ -489,12 +540,15 @@ def synthesize_notes(facts: RepoFacts, breakdown: dict[str, float]) -> tuple[lis
         strengths.append("Deployment/containerization hints exist via Docker-related files.")
     if facts.has_migrations:
         strengths.append("Schema or migration-related files were found, suggesting some persistence discipline.")
-    if facts.analyzer.get("applied") and facts.analyzer.get("status") == "pass":
+    if facts.analyzer.applied and facts.analyzer.status == "pass":
         strengths.append("Backbone analyzer completed successfully for the detected ecosystem.")
 
     if not facts.has_tests:
         risks.append("No tests were detected, which materially lowers trust in correctness and safe iteration.")
         improvements.append("Add a real test suite for core flows before trusting the repo more broadly.")
+    elif strictness == "strict" and facts.test_files < max(2, facts.source_files // 5):
+        risks.append("Test presence exists, but breadth still looks thin under strict scoring.")
+        improvements.append("Expand tests to cover core modules and critical edge cases, not just happy paths.")
     if not facts.has_ci:
         risks.append("No CI workflow was detected, so quality gates may rely on manual discipline.")
         improvements.append("Add CI to run lint/typecheck/tests on every change.")
@@ -513,6 +567,9 @@ def synthesize_notes(facts: RepoFacts, breakdown: dict[str, float]) -> tuple[lis
     if breakdown["production_readiness"] < 5.5:
         risks.append("Production readiness appears below strong deployment confidence.")
         improvements.append("Add missing operational basics: CI, health checks, deployment clarity, and resilience rules.")
+    if strictness == "strict" and not facts.has_healthcheck:
+        risks.append("Strict mode expects clearer runtime operability signals such as health/readiness endpoints.")
+        improvements.append("Add health or readiness indicators to improve operational confidence.")
 
     if not improvements:
         improvements.append("Calibrate the scorer on more repositories and deepen language-specific analyzers.")
@@ -529,18 +586,17 @@ def synthesize_notes(facts: RepoFacts, breakdown: dict[str, float]) -> tuple[lis
     return dedupe(strengths)[:5], dedupe(risks)[:5], dedupe(red_flags)[:5], dedupe(improvements)[:5]
 
 
-def compute_report(repo_url: str, repo_path: Path, branch: str | None) -> ScoreReport:
-    facts, _s, _r, _rf = walk_repo(repo_path)
-    facts.repo = repo_url
-    facts.branch = branch
-    facts.analyzer = maybe_run_backbone(repo_path, facts)
+def compute_report(repo_url: str, repo_path: Path, branch: str | None, subdir: str | None, strictness: str, language_hint: str | None, output_format: str) -> ScoreReport:
+    scan_path = resolve_repo_path(repo_path, subdir)
+    facts = walk_repo(scan_path, repo_url, branch, language_hint)
+    facts.analyzer = maybe_run_backbone(scan_path, facts)
 
-    architecture = score_architecture(facts)
-    code_quality = score_code_quality(facts)
-    security = score_security(facts)
-    testing = score_testing(facts)
-    documentation = score_documentation(facts)
-    production_readiness = score_production_readiness(facts)
+    architecture = score_architecture(facts, strictness)
+    code_quality = score_code_quality(facts, strictness)
+    security = score_security(facts, strictness)
+    testing = score_testing(facts, strictness)
+    documentation = score_documentation(facts, strictness)
+    production_readiness = score_production_readiness(facts, strictness)
 
     breakdown = {
         "architecture": architecture,
@@ -560,14 +616,17 @@ def compute_report(repo_url: str, repo_path: Path, branch: str | None) -> ScoreR
         low=1.0,
         high=10.0,
     )
-    strengths, risks, red_flags, improvements = synthesize_notes(facts, breakdown)
+    strengths, risks, red_flags, improvements = synthesize_notes(facts, breakdown, strictness)
     confidence = confidence_for(facts)
+    maturity_level, verdict = classify_report(code_quality_score, production_readiness_score)
 
     return ScoreReport(
         schema_version=SCHEMA_VERSION,
         repo=repo_url,
-        local_path=str(repo_path),
+        local_path=str(scan_path),
         confidence=confidence,
+        verdict=verdict,
+        maturity_level=maturity_level,
         code_quality_score=code_quality_score,
         production_readiness_score=production_readiness_score,
         breakdown=breakdown,
@@ -575,6 +634,14 @@ def compute_report(repo_url: str, repo_path: Path, branch: str | None) -> ScoreR
         risks=risks,
         red_flags=red_flags,
         top_improvements=improvements,
+        inputs=ScoreInputs(
+            repo=repo_url,
+            branch=branch,
+            subdir=subdir,
+            strictness=strictness,
+            language_hint=language_hint,
+            output_format=output_format,
+        ),
         facts=facts,
     )
 
@@ -585,6 +652,8 @@ def render_text(report: ScoreReport) -> str:
         "",
         f"Code Quality Score: {report.code_quality_score:.1f} / 10",
         f"Production Readiness Score: {report.production_readiness_score:.1f} / 10",
+        f"Maturity level: {report.maturity_level}",
+        f"Verdict: {report.verdict}",
         f"Confidence: {report.confidence}",
         "",
         "Breakdown:",
@@ -594,6 +663,12 @@ def render_text(report: ScoreReport) -> str:
         f"- Testing: {report.breakdown['testing']:.1f}",
         f"- Documentation: {report.breakdown['documentation']:.1f}",
         f"- Production readiness: {report.breakdown['production_readiness']:.1f}",
+        "",
+        "Inputs:",
+        f"- Strictness: {report.inputs.strictness}",
+        f"- Branch: {report.inputs.branch or 'default'}",
+        f"- Subdir: {report.inputs.subdir or '/'}",
+        f"- Language hint: {report.inputs.language_hint or 'auto'}",
         "",
         "Strengths:",
     ]
@@ -618,7 +693,7 @@ def render_text(report: ScoreReport) -> str:
     lines.append(f"- Has env example: {report.facts.has_env_example}")
     lines.append(f"- Has migrations: {report.facts.has_migrations}")
     lines.append(f"- Largest file lines: {report.facts.max_file_lines}")
-    lines.append(f"- Backbone analyzer: {report.facts.analyzer.get('status')}")
+    lines.append(f"- Backbone analyzer: {report.facts.analyzer.status}")
     return "\n".join(lines)
 
 
@@ -626,7 +701,10 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Score GitHub repositories for code quality and production readiness")
     parser.add_argument("repo", help="GitHub repository URL or local path")
     parser.add_argument("--branch", help="Optional git branch/ref to clone", default=None)
-    parser.add_argument("--format", choices=["text", "json"], default="text")
+    parser.add_argument("--subdir", help="Optional repository subdirectory to score", default=None)
+    parser.add_argument("--strictness", choices=["relaxed", "balanced", "strict"], default="balanced")
+    parser.add_argument("--language-hint", help="Override detected dominant language label", default=None)
+    parser.add_argument("--format", choices=["text", "json", "both"], default="text")
     parser.add_argument("--keep-repo", action="store_true", help="Keep cloned temporary repo for inspection")
     return parser.parse_args()
 
@@ -646,9 +724,21 @@ def main() -> int:
             if not repo_path.exists():
                 raise FileNotFoundError(f"Path not found: {repo_path}")
 
-        report = compute_report(repo_arg, repo_path, args.branch)
+        report = compute_report(
+            repo_url=repo_arg,
+            repo_path=repo_path,
+            branch=args.branch,
+            subdir=args.subdir,
+            strictness=args.strictness,
+            language_hint=args.language_hint,
+            output_format=args.format,
+        )
+        payload = asdict(report)
         if args.format == "json":
-            payload = asdict(report)
+            print(json.dumps(payload, indent=2, ensure_ascii=False))
+        elif args.format == "both":
+            print(render_text(report))
+            print("\n--- JSON ---")
             print(json.dumps(payload, indent=2, ensure_ascii=False))
         else:
             print(render_text(report))
