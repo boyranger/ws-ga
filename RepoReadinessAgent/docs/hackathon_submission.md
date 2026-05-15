@@ -71,7 +71,7 @@ The product is clear because it has a narrow user, a specific problem, and a sim
 
 A solo founder pastes a GitHub URL before a demo or before hiring a contractor. The agent reviews the codebase and returns:
 - **Stage:** MVP
-- **Verdict:** good for demo, not ready for handoff
+- **Verdict:** usable for demos or early users, but still needs focused hardening before handoff
 - **Top fixes:** add CI, improve critical flow tests, document environment setup
 
 ## Why now?

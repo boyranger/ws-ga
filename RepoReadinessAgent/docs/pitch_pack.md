@@ -59,6 +59,7 @@ When presenting, emphasize:
 - the product gives a founder decision, not just a code score
 - the output is actionable: stage, risks, and next fixes
 - the follow-up loop makes the product feel like a real agent over time
+- the sample output and live CLI wording should stay consistent
 
 ## 7. Suggested demo assets
 

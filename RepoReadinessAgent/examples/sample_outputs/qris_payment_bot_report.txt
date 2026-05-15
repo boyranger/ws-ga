@@ -1,0 +1,14 @@
+Stage: MVP
+Verdict: This repository looks usable for demos or early users, but it still needs focused hardening before handoff.
+Confidence: Medium
+
+Top risks:
+- No CI workflow was detected, so quality gates may rely on manual discipline.
+
+Top 3 fixes:
+- Add CI to run lint/typecheck/tests on every change.
+
+Founder gates:
+- Demo-safe? yes
+- Launch-ready? not yet
+- Handoff-ready? not yet
