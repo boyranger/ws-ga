@@ -78,6 +78,8 @@ If you need the fastest walkthrough:
 - `docs/hackathon_submission.md`
 - `docs/repo_quality_scorer_hackathon_positioning.md`
 - `docs/architecture_boundaries.md`
+- `docs/public_telegram_bot_architecture.md`
+- `docs/public_telegram_bot_implementation_plan.md`
 
 ## Product-layer implementation status
 
