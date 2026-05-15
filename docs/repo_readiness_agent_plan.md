@@ -182,6 +182,33 @@ Repo Readiness Agent should do four things well:
 
 If these four behaviors work, the hackathon product is strong enough.
 
+### Compact product loop
+
+For product explanation and demo consistency, the same behavior should also be described as a 4-phase loop:
+1. **Repo Intake**
+2. **Signal Inspection**
+3. **Readiness Judgment**
+4. **Founder Guidance**
+
+This gives the product a stronger autonomous structure while keeping the implementation narrow.
+
+### Autonomous follow-up loop
+
+For a stronger agent story, the product can also support a lightweight follow-up loop for already-submitted repositories.
+
+Follow-up behavior:
+1. re-check the same repository on a daily schedule
+2. run Signal Inspection again
+3. run Readiness Judgment again
+4. run Founder Guidance again
+5. compare the new report against the previous one
+6. notify the founder whether:
+   - the repo improved
+   - the stage stayed the same
+   - there is still no visible progress on the recommended fixes
+
+This is a good autonomy enhancer because the founder does not need to manually remember to re-audit the repository.
+
 ---
 
 ## Phase plan
@@ -253,6 +280,12 @@ Help founders understand not only the stage, but why.
 - launch blockers
 - why this stage
 - why these fixes first
+- demo-safe / not-yet gate
+- launch-ready / not-yet gate
+- handoff-ready / not-yet gate
+- daily follow-up status: improved / unchanged / still blocked
+
+These should be treated as founder-facing decision aids, not as an excuse to expand the product into a broader project management system.
 
 ### Definition of done
 The report is understandable by a founder, not only by an engineer.

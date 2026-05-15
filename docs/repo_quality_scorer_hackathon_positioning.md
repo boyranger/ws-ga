@@ -104,6 +104,23 @@ To keep the product easy to explain, the agent should be framed as a compact end
 
 This phase framing is intentionally small. It gives the product a stronger autonomous shape without turning it into a sprawling multi-stage platform.
 
+### Optional autonomous follow-up loop
+
+To make the product feel more agentic over time, the same submitted repository can be re-checked on a daily cadence.
+
+Daily follow-up loop:
+1. re-open the submitted repository
+2. run **Signal Inspection** again
+3. run **Readiness Judgment** again
+4. run **Founder Guidance** again
+5. compare the latest result with the previous report
+6. notify the founder if:
+   - readiness improved
+   - key blockers were removed
+   - there is still no meaningful progress on the recommended fixes
+
+This makes the agent feel like an active follow-up partner, not just a one-time evaluator.
+
 ---
 
 ## Solution statement

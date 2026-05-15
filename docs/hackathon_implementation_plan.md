@@ -117,6 +117,19 @@ The scorer output naturally reads like Repo Readiness Agent output.
   - verdict
   - top risks
   - top 3 fixes
+- [ ] Add compact 4-phase language where useful:
+  - Repo Intake
+  - Signal Inspection
+  - Readiness Judgment
+  - Founder Guidance
+- [ ] Prepare founder-facing gates where useful:
+  - Demo-safe?
+  - Launch-ready?
+  - Handoff-ready?
+- [ ] Define the follow-up status concept for monitored repos:
+  - Improved
+  - Unchanged
+  - Still blocked
 - [ ] Ensure wording is consistent with submission docs
 
 ### Owner
@@ -210,6 +223,10 @@ There is no known critical blocker in the chosen demo path.
 
 ### Goal
 Make the product easy to defend in front of judges.
+
+This workstream should borrow narrative strength from larger autonomous systems only at the presentation layer: strong phase language, clear decision loops, and artifact-style outputs — without importing unnecessary implementation complexity.
+
+A good optional autonomy enhancer for presentation is the daily follow-up loop: once a founder submits a repo, the agent can re-check it later and notify whether progress was made or whether the same blockers still remain.
 
 ### Tasks
 - [ ] Prepare a short explanation of autonomy
