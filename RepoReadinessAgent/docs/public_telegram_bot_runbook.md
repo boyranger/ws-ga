@@ -58,4 +58,5 @@ Run once daily at 9:00 AM server time:
 - SQLite is enough for demo/hackathon traffic.
 - Keep the DB file local and ignored.
 - Keep the Telegram token in environment variables or a secrets manager.
-- The follow-up runner currently outputs batch JSON; notification delivery can be added as the next step.
+- The follow-up runner now supports automatic Telegram delivery for due follow-ups when `REPO_READINESS_TELEGRAM_BOT_TOKEN` is present.
+- Practical hackathon setup: run the bot normally for chat interactions, and run the follow-up runner from cron once per day to deliver autonomous progress checks.
