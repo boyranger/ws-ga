@@ -130,6 +130,9 @@ The scorer output naturally reads like Repo Readiness Agent output.
   - Improved
   - Unchanged
   - Still blocked
+- [ ] Define the monitoring stop condition:
+  - Target reached
+  - Keep monitoring
 - [ ] Ensure wording is consistent with submission docs
 
 ### Owner
@@ -227,6 +230,8 @@ Make the product easy to defend in front of judges.
 This workstream should borrow narrative strength from larger autonomous systems only at the presentation layer: strong phase language, clear decision loops, and artifact-style outputs — without importing unnecessary implementation complexity.
 
 A good optional autonomy enhancer for presentation is the daily follow-up loop: once a founder submits a repo, the agent can re-check it later and notify whether progress was made or whether the same blockers still remain.
+
+That loop should also have a clear stopping rule: it keeps monitoring until the repository reaches the founder's target confidence/readiness state, instead of notifying forever.
 
 ### Tasks
 - [ ] Prepare a short explanation of autonomy

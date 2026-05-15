@@ -118,6 +118,12 @@ Daily follow-up loop:
    - readiness improved
    - key blockers were removed
    - there is still no meaningful progress on the recommended fixes
+7. stop the daily loop once the repository reaches the target confidence / readiness state
+
+Suggested stop condition for hackathon framing:
+- stop when the repo is already at the desired maturity target and the confidence is strong enough for the founder's goal
+- example: the repo reaches **Handoff-ready** with **High confidence**
+- or stop earlier if the founder only cares about becoming **demo-safe** or reaching **MVP**
 
 This makes the agent feel like an active follow-up partner, not just a one-time evaluator.
 

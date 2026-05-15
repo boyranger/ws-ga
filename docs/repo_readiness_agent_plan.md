@@ -206,6 +206,14 @@ Follow-up behavior:
    - the repo improved
    - the stage stayed the same
    - there is still no visible progress on the recommended fixes
+7. stop monitoring once the repository reaches the agreed target state
+
+Suggested stop conditions:
+- stop when the repository reaches the desired stage with sufficient confidence
+- default aspirational example: **Handoff-ready** with **High confidence**
+- lower target examples may also be valid depending on founder intent:
+  - **MVP** with enough confidence to demo
+  - **demo-safe** with no critical blockers remaining
 
 This is a good autonomy enhancer because the founder does not need to manually remember to re-audit the repository.
 
@@ -284,6 +292,7 @@ Help founders understand not only the stage, but why.
 - launch-ready / not-yet gate
 - handoff-ready / not-yet gate
 - daily follow-up status: improved / unchanged / still blocked
+- monitoring stop condition: target reached / keep monitoring
 
 These should be treated as founder-facing decision aids, not as an excuse to expand the product into a broader project management system.
 
