@@ -11,11 +11,11 @@ def render_text_report(report: ProductReport) -> str:
         f"Verdict: {report.verdict}",
         f"Confidence: {report.confidence}",
         "",
-        "Top risks:",
+        "Risiko utama:",
     ]
     lines.extend(f"- {risk}" for risk in report.top_risks)
     lines.append("")
-    lines.append("Top 3 fixes:")
+    lines.append("Top 3 perbaikan:")
     lines.extend(f"- {fix}" for fix in report.top_fixes)
 
     if report.gates:

@@ -19,38 +19,38 @@ async def start_handler(update: Any, context: Any) -> None:
     user_id, username, first_name, last_name = _telegram_user_parts(update)
     service: RepoTrackingService = context.application.bot_data["repo_tracking_service"]
     service._upsert_user(user_id, username, first_name, last_name)
-    name = first_name or username or "there"
+    name = first_name or username or "teman"
     await update.effective_message.reply_text(
-        f"Hi {name} — welcome to RepoReadinessAgent.\n\n"
-        "I help you inspect a GitHub repository, judge its readiness stage, and track its progress over time.\n\n"
-        "What you can do here:\n"
-        "- inspect a repo and get a founder-friendly readiness report\n"
-        "- save that repo under your own tracking record\n"
-        "- re-check later and compare whether it improved\n\n"
-        "Best first step:\n"
-        "1. Send /inspect https://github.com/owner/repo\n"
-        "2. Review the stage, verdict, top risks, and top fixes\n"
-        "3. If you want monitoring, use /track https://github.com/owner/repo\n\n"
-        "Use /help to see all commands."
+        f"Halo {name} — selamat datang di RepoReadinessAgent.\n\n"
+        "Saya membantu kamu menginspeksi repository GitHub, menilai tahap kesiapan repo, dan melacak progresnya dari waktu ke waktu.\n\n"
+        "Yang bisa kamu lakukan di sini:\n"
+        "- inspeksi repo dan dapatkan readiness report yang mudah dipahami\n"
+        "- simpan repo itu ke tracking milikmu sendiri\n"
+        "- cek ulang nanti dan bandingkan apakah repo-nya membaik\n\n"
+        "Langkah awal yang disarankan:\n"
+        "1. Kirim /inspect https://github.com/owner/repo\n"
+        "2. Lihat stage, verdict, top risks, dan top fixes\n"
+        "3. Kalau mau dimonitor, pakai /track https://github.com/owner/repo\n\n"
+        "Ketik /help untuk melihat semua command."
     )
 
 
 async def help_handler(update: Any, context: Any) -> None:
     del context
     await update.effective_message.reply_text(
-        "RepoReadinessAgent commands:\n\n"
-        "/start — introduction and first steps\n"
-        "/help — show this command list\n"
-        "/inspect <github_url> — inspect a repo and generate a readiness report\n"
-        "/track <github_url> — save a repo and enable tracking for it\n"
-        "/myrepos — list your tracked repositories\n"
-        "/report <tracking_id> — show the latest saved report\n"
-        "/followup <tracking_id> — re-check a tracked repo and compare progress\n"
-        "/untrack <tracking_id> — disable tracking for a repo\n\n"
-        "Recommended flow:\n"
-        "1. /inspect a GitHub repo\n"
-        "2. If useful, /track it\n"
-        "3. Later, use /followup to see whether readiness improved"
+        "Command RepoReadinessAgent:\n\n"
+        "/start — pengantar dan langkah pertama\n"
+        "/help — tampilkan daftar command ini\n"
+        "/inspect <github_url> — inspeksi repo dan buat readiness report\n"
+        "/track <github_url> — simpan repo dan aktifkan tracking\n"
+        "/myrepos — lihat daftar repo yang kamu track\n"
+        "/report <tracking_id> — tampilkan report terakhir yang tersimpan\n"
+        "/followup <tracking_id> — cek ulang repo yang di-track dan bandingkan progresnya\n"
+        "/untrack <tracking_id> — nonaktifkan tracking repo\n\n"
+        "Alur yang disarankan:\n"
+        "1. Jalankan /inspect untuk repo GitHub\n"
+        "2. Kalau berguna, lanjut /track\n"
+        "3. Nanti pakai /followup untuk lihat apakah readiness-nya membaik"
     )
 
 
@@ -58,7 +58,7 @@ async def inspect_handler(update: Any, context: Any) -> None:
     user_id, username, first_name, last_name = _telegram_user_parts(update)
     service: RepoTrackingService = context.application.bot_data["repo_tracking_service"]
     if not context.args:
-        await update.effective_message.reply_text("Usage: /inspect https://github.com/owner/repo")
+        await update.effective_message.reply_text("Cara pakai: /inspect https://github.com/owner/repo")
         return
     repo_url = context.args[0]
     try:
@@ -75,14 +75,14 @@ async def inspect_handler(update: Any, context: Any) -> None:
     except ValidationError as exc:
         await update.effective_message.reply_text(str(exc))
     except Exception as exc:
-        await update.effective_message.reply_text(f"Inspection failed: {exc}")
+        await update.effective_message.reply_text(f"Inspect gagal: {exc}")
 
 
 async def track_handler(update: Any, context: Any) -> None:
     user_id, username, first_name, last_name = _telegram_user_parts(update)
     service: RepoTrackingService = context.application.bot_data["repo_tracking_service"]
     if not context.args:
-        await update.effective_message.reply_text("Usage: /track https://github.com/owner/repo")
+        await update.effective_message.reply_text("Cara pakai: /track https://github.com/owner/repo")
         return
     repo_url = context.args[0]
     try:
@@ -94,12 +94,12 @@ async def track_handler(update: Any, context: Any) -> None:
             repo_url=repo_url,
         )
         await update.effective_message.reply_text(
-            f"Tracking enabled.\nTracking ID: {tracked.id}\nRepo: {tracked.repo_normalized}"
+            f"Tracking aktif.\nTracking ID: {tracked.id}\nRepo: {tracked.repo_normalized}"
         )
     except ValidationError as exc:
         await update.effective_message.reply_text(str(exc))
     except Exception as exc:
-        await update.effective_message.reply_text(f"Could not enable tracking: {exc}")
+        await update.effective_message.reply_text(f"Gagal mengaktifkan tracking: {exc}")
 
 
 async def myrepos_handler(update: Any, context: Any) -> None:
@@ -112,11 +112,11 @@ async def myrepos_handler(update: Any, context: Any) -> None:
         last_name=last_name,
     )
     if not repos:
-        await update.effective_message.reply_text("You do not have any tracked repositories yet. Use /inspect first.")
+        await update.effective_message.reply_text("Kamu belum punya repo yang di-track. Jalankan /inspect dulu.")
         return
-    lines = ["Your tracked repositories:"]
+    lines = ["Daftar repo yang kamu track:"]
     for item in repos:
-        latest = f"{item.latest_stage} / {item.latest_confidence}" if item.latest_stage else "no report yet"
+        latest = f"{item.latest_stage} / {item.latest_confidence}" if item.latest_stage else "belum ada report"
         lines.append(f"- #{item.tracking_id} {item.repo_normalized} [{item.status}] — {latest}")
     await update.effective_message.reply_text("\n".join(lines))
 
@@ -146,7 +146,7 @@ async def report_handler(update: Any, context: Any) -> None:
     except (ValidationError, NotFoundError) as exc:
         await update.effective_message.reply_text(str(exc))
     except Exception as exc:
-        await update.effective_message.reply_text(f"Could not load report: {exc}")
+        await update.effective_message.reply_text(f"Gagal memuat report: {exc}")
 
 
 async def followup_handler(update: Any, context: Any) -> None:
@@ -174,7 +174,7 @@ async def followup_handler(update: Any, context: Any) -> None:
     except (ValidationError, NotFoundError) as exc:
         await update.effective_message.reply_text(str(exc))
     except Exception as exc:
-        await update.effective_message.reply_text(f"Could not run follow-up: {exc}")
+        await update.effective_message.reply_text(f"Gagal menjalankan follow-up: {exc}")
 
 
 async def untrack_handler(update: Any, context: Any) -> None:
@@ -197,9 +197,9 @@ async def untrack_handler(update: Any, context: Any) -> None:
             tracking_id=tracking_id,
         )
         await update.effective_message.reply_text(
-            f"Tracking disabled.\nTracking ID: {tracked.id}\nRepo: {tracked.repo_normalized}"
+            f"Tracking dimatikan.\nTracking ID: {tracked.id}\nRepo: {tracked.repo_normalized}"
         )
     except (ValidationError, NotFoundError) as exc:
         await update.effective_message.reply_text(str(exc))
     except Exception as exc:
-        await update.effective_message.reply_text(f"Could not disable tracking: {exc}")
+        await update.effective_message.reply_text(f"Gagal mematikan tracking: {exc}")
