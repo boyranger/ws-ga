@@ -139,6 +139,9 @@ class ScoreReport:
     maturity_level: str
     code_quality_score: float
     production_readiness_score: float
+    founder_gates: dict[str, str]
+    follow_up_status_options: list[str]
+    monitoring_stop_conditions: list[str]
     breakdown: dict[str, float]
     strengths: list[str]
     risks: list[str]
@@ -516,12 +519,23 @@ def classify_report(code_quality_score: float, production_readiness_score: float
     floor = min(code_quality_score, production_readiness_score)
 
     if combined >= 8.5 and floor >= 8.0:
-        return "Production-capable", "Strong production posture with good engineering discipline."
+        return "Handoff-ready", "This repository looks ready for handoff, with strong engineering discipline and only limited cleanup left."
     if combined >= 7.2 and floor >= 6.5:
-        return "Maturing", "Promising repository with meaningful quality signals, but still needs hardening."
+        return "Handoff-ready", "This repository is close to handoff-ready, but a few hardening steps should be finished before relying on it fully."
     if combined >= 5.5 and floor >= 4.5:
-        return "MVP", "Usable foundation, though several quality or operational gaps still need attention."
-    return "Prototype", "Early-stage repository with notable quality or readiness gaps."
+        return "MVP", "This repository looks usable for demos or early users, but it still needs focused hardening before handoff."
+    return "Prototype", "This repository still behaves like a prototype and needs more engineering work before it is safe to rely on broadly."
+
+
+def founder_gates_for(maturity_level: str, confidence: str, production_readiness_score: float, testing_score: float) -> dict[str, str]:
+    demo_safe = "yes" if maturity_level in {"MVP", "Handoff-ready"} and confidence != "Low" else "not yet"
+    launch_ready = "yes" if maturity_level == "Handoff-ready" and production_readiness_score >= 7.0 else "not yet"
+    handoff_ready = "yes" if maturity_level == "Handoff-ready" and production_readiness_score >= 7.5 and testing_score >= 6.0 else "not yet"
+    return {
+        "demo_safe": demo_safe,
+        "launch_ready": launch_ready,
+        "handoff_ready": handoff_ready,
+    }
 
 
 def synthesize_notes(facts: RepoFacts, breakdown: dict[str, float], strictness: str) -> tuple[list[str], list[str], list[str], list[str]]:
@@ -619,6 +633,7 @@ def compute_report(repo_url: str, repo_path: Path, branch: str | None, subdir: s
     strengths, risks, red_flags, improvements = synthesize_notes(facts, breakdown, strictness)
     confidence = confidence_for(facts)
     maturity_level, verdict = classify_report(code_quality_score, production_readiness_score)
+    founder_gates = founder_gates_for(maturity_level, confidence, production_readiness_score, testing)
 
     return ScoreReport(
         schema_version=SCHEMA_VERSION,
@@ -629,11 +644,14 @@ def compute_report(repo_url: str, repo_path: Path, branch: str | None, subdir: s
         maturity_level=maturity_level,
         code_quality_score=code_quality_score,
         production_readiness_score=production_readiness_score,
+        founder_gates=founder_gates,
+        follow_up_status_options=["Improved", "Unchanged", "Still blocked"],
+        monitoring_stop_conditions=["Target reached", "Keep monitoring"],
         breakdown=breakdown,
         strengths=strengths,
         risks=risks,
         red_flags=red_flags,
-        top_improvements=improvements,
+        top_improvements=improvements[:3],
         inputs=ScoreInputs(
             repo=repo_url,
             branch=branch,
@@ -650,39 +668,51 @@ def render_text(report: ScoreReport) -> str:
     lines = [
         f"Repo: {report.repo}",
         "",
-        f"Code Quality Score: {report.code_quality_score:.1f} / 10",
-        f"Production Readiness Score: {report.production_readiness_score:.1f} / 10",
-        f"Maturity level: {report.maturity_level}",
+        f"Stage: {report.maturity_level}",
         f"Verdict: {report.verdict}",
         f"Confidence: {report.confidence}",
+        f"Demo-safe? {report.founder_gates['demo_safe']}",
+        f"Launch-ready? {report.founder_gates['launch_ready']}",
+        f"Handoff-ready? {report.founder_gates['handoff_ready']}",
         "",
-        "Breakdown:",
+        f"Code Quality Score: {report.code_quality_score:.1f} / 10",
+        f"Production Readiness Score: {report.production_readiness_score:.1f} / 10",
+        "",
+        "Top risks:",
+    ]
+    lines.extend([f"- {item}" for item in (report.risks[:3] or ["None noted."])])
+    lines.append("")
+    lines.append("Top 3 fixes:")
+    for idx, item in enumerate(report.top_improvements[:3] or ["None noted."], start=1):
+        lines.append(f"{idx}. {item}")
+    lines.append("")
+    lines.append("Signal breakdown:")
+    lines.extend([
         f"- Architecture: {report.breakdown['architecture']:.1f}",
         f"- Code quality: {report.breakdown['code_quality']:.1f}",
         f"- Security: {report.breakdown['security']:.1f}",
         f"- Testing: {report.breakdown['testing']:.1f}",
         f"- Documentation: {report.breakdown['documentation']:.1f}",
         f"- Production readiness: {report.breakdown['production_readiness']:.1f}",
-        "",
-        "Inputs:",
-        f"- Strictness: {report.inputs.strictness}",
-        f"- Branch: {report.inputs.branch or 'default'}",
-        f"- Subdir: {report.inputs.subdir or '/'}",
-        f"- Language hint: {report.inputs.language_hint or 'auto'}",
-        "",
-        "Strengths:",
-    ]
-    lines.extend([f"- {item}" for item in (report.strengths or ["None noted."])])
+    ])
     lines.append("")
-    lines.append("Risks:")
-    lines.extend([f"- {item}" for item in (report.risks or ["None noted."])])
+    lines.append("Strengths:")
+    lines.extend([f"- {item}" for item in (report.strengths or ["None noted."])])
     lines.append("")
     lines.append("Red flags:")
     lines.extend([f"- {item}" for item in (report.red_flags or ["None noted."])])
     lines.append("")
-    lines.append("Top improvements:")
-    for idx, item in enumerate(report.top_improvements or ["None noted."], start=1):
-        lines.append(f"{idx}. {item}")
+    lines.append("Follow-up status options:")
+    lines.extend([f"- {item}" for item in report.follow_up_status_options])
+    lines.append("")
+    lines.append("Monitoring stop conditions:")
+    lines.extend([f"- {item}" for item in report.monitoring_stop_conditions])
+    lines.append("")
+    lines.append("Inputs:")
+    lines.append(f"- Strictness: {report.inputs.strictness}")
+    lines.append(f"- Branch: {report.inputs.branch or 'default'}")
+    lines.append(f"- Subdir: {report.inputs.subdir or '/'}")
+    lines.append(f"- Language hint: {report.inputs.language_hint or 'auto'}")
     lines.append("")
     lines.append("Facts:")
     lines.append(f"- Dominant language: {report.facts.dominant_language}")
