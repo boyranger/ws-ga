@@ -2,13 +2,14 @@
 
 ## Purpose
 
-This document is the concrete implementation contract for Mahdy's side of the product work.
+This document locks the product-facing behavior contract for Repo Readiness Agent.
 
 It defines:
 - the intended product behavior
 - the visible output shape
 - the meaning of stages
 - the follow-up logic
+- the stopping logic for ongoing monitoring
 
 ---
 
@@ -29,6 +30,8 @@ The product should behave as this 4-step loop:
 
 ## 2. Visible output contract
 
+Every visible report should feel like a founder decision artifact, not a raw scoring dump.
+
 ### Required sections
 - **Stage**
 - **Verdict**
@@ -41,12 +44,23 @@ The product should behave as this 4-step loop:
 - **Launch-ready?** yes / not yet
 - **Handoff-ready?** yes / not yet
 
+### Output principle
+The output should help a founder answer:
+1. What stage is this repo in?
+2. Can I demo, launch, or hand this off yet?
+3. What are the biggest risks?
+4. What should I fix next?
+
 ---
 
 ## 3. Stage definitions
 
 ### Prototype
 The repository shows early product momentum, but still has meaningful engineering gaps that make it fragile for reliable demo, launch, or handoff.
+
+Founder interpretation:
+- promising, but still risky
+- not yet trustworthy for confident handoff
 
 Typical signals:
 - weak or missing tests
@@ -57,6 +71,11 @@ Typical signals:
 ### MVP
 The repository is usable and promising, but still has important gaps before strong handoff or confident production use.
 
+Founder interpretation:
+- good enough to show progress
+- may be demoable
+- still needs strengthening before deeper trust
+
 Typical signals:
 - some structure is in place
 - core flows exist
@@ -65,6 +84,10 @@ Typical signals:
 
 ### Handoff-ready
 The repository shows enough structure, clarity, and supporting evidence that it can be handed to another engineer with reasonable confidence.
+
+Founder interpretation:
+- strong enough for delegation
+- lower hidden-engineering-risk than earlier stages
 
 Typical signals:
 - clearer architecture
@@ -92,6 +115,10 @@ When a previously submitted repository is checked again, compare the latest resu
   - the founder's target readiness/confidence state has been achieved
 - **Keep monitoring**
   - the target state has not yet been reached
+
+### Monitoring principle
+The product should not notify forever.
+It should keep monitoring only while the founder's target state has not yet been reached.
 
 ---
 

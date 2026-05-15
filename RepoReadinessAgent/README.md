@@ -9,6 +9,10 @@ It helps answer a founder-level question:
 
 And it highlights the top risks and next fixes that matter most.
 
+## One-line summary
+
+An autonomous repo readiness agent that reviews a GitHub repository and gives a founder-facing judgment on whether it is still a Prototype, already an MVP, or ready for handoff.
+
 ## Current repository structure
 
 - `docs/` - product identity, contract, scoring model, demo script, positioning, and hackathon-facing docs
@@ -23,6 +27,15 @@ And it highlights the top risks and next fixes that matter most.
 2. **Signal Inspection**
 3. **Readiness Judgment**
 4. **Founder Guidance**
+
+## Core output
+
+Every product-facing report aims to return:
+- Stage
+- Verdict
+- Top risks
+- Top 3 fixes
+- Confidence
 
 ## Current status
 
