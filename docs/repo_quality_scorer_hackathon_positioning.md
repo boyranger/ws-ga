@@ -4,6 +4,8 @@
 
 This document is the scope guardrail for the hackathon version of `repo_quality_scorer`.
 
+For the execution plan and single-agent product structure, also see `docs/repo_readiness_agent_plan.md`.
+
 Use it to keep product decisions narrow, consistent, and founder-focused.
 
 This is not just pitch copy. It is an operating constraint for future implementation, UX, output design, and demo decisions.
