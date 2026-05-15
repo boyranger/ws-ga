@@ -213,6 +213,11 @@ PYTHONPATH=src .venv/bin/python -m repo_readiness_agent.cli followup \
 Watch the short demo here:
 - <https://youtube.com/shorts/2_uDVw3i7Jc?feature=share>
 
+## Pitch deck
+
+View the pitch deck here:
+- <https://drive.google.com/file/d/1tLV0N_EGRQJNIKlHh0h2an0x_Djl-7J1/view?usp=sharing>
+
 ---
 
 ## Fastest demo path
