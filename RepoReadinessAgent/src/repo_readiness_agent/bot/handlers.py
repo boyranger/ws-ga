@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from ..formatter import render_text_report
+from ..formatter import build_fix_prompts, render_text_report
 from .service import NotFoundError, RepoTrackingService, ValidationError
 
 _GITHUB_URL_RE = re.compile(r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+(?:\.git)?/?")
@@ -288,6 +288,13 @@ async def conversational_message_handler(update: Any, context: Any) -> None:
                 risks = "\n".join(f"- {risk}" for risk in report.top_risks)
                 await update.effective_message.reply_text(
                     f"Dari analisis terakhir untuk {tracked_repo.repo_normalized}, risiko utamanya adalah:\n{risks}"
+                )
+                return
+
+            if any(keyword in lowered for keyword in ["prompt", "prompt perbaikan", "prompt fix", "prompt rekomendasi"]):
+                prompts = build_fix_prompts(report)
+                await update.effective_message.reply_text(
+                    f"Ini prompt rekomendasi untuk {tracked_repo.repo_normalized}:\n\n" + "\n\n".join(prompts)
                 )
                 return
 
