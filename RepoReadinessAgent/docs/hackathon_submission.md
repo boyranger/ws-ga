@@ -29,6 +29,7 @@ It then synthesizes those signals into founder-friendly outputs:
 - verdict
 - top risks
 - top 3 next fixes
+- execution-ready improvement brief for the current priorities
 
 ## What is the solution?
 
@@ -40,7 +41,7 @@ Repo Readiness Agent turns a GitHub repository into a clear, actionable readines
 
 ### Autonomous
 
-The product is autonomous because the agent does not require the user to specify what files to inspect or what checks to run. It independently clones the repo, identifies relevant engineering signals, runs supporting analysis, and produces a maturity verdict with prioritized next actions.
+The product is autonomous because the agent does not require the user to specify what files to inspect or what checks to run. It independently clones the repo, identifies relevant engineering signals, runs supporting analysis, produces a maturity verdict with prioritized next actions, and can follow up later with an autonomous delta brief for tracked repositories.
 
 ### Creativity
 
@@ -65,6 +66,8 @@ The product is clear because it has a narrow user, a specific problem, and a sim
 - Founder-friendly verdict
 - Top risks
 - Top 3 next fixes
+- Autonomous improvement brief for immediate execution
+- Autonomous delta brief during follow-up
 - Supporting engineering scores across architecture, quality, security, testing, docs, and readiness
 
 ## Example Use Case

@@ -27,8 +27,16 @@ The agent then performs the rest of the decision loop itself:
 2. **Signal Inspection** - inspect relevant engineering signals
 3. **Readiness Judgment** - determine the maturity stage
 4. **Founder Guidance** - return the verdict, risks, and next fixes
+5. **Autonomous Improvement Brief** - translate the top fixes into an execution-ready brief
+6. **Follow-up Loop** - re-check the same repo later, compare progress, and generate a delta brief
 
 The founder does not need to manually choose files, define checks, or interpret technical evidence step by step.
+
+What makes the autonomy visible in the current product:
+- the agent identifies the likely target files
+- the agent can point to grounded line/area hints when scan evidence exists
+- the agent generates a founder-usable improvement brief
+- the agent can automatically re-check a tracked repo and send a delta brief later
 
 ---
 
@@ -57,8 +65,9 @@ Repo Readiness Agent closes that gap by turning repo evidence into a practical f
 When presenting, emphasize:
 - repo readiness uncertainty is the real problem
 - the product gives a founder decision, not just a code score
-- the output is actionable: stage, risks, and next fixes
+- the output is actionable: stage, risks, next fixes, and an improvement brief
 - the follow-up loop makes the product feel like a real agent over time
+- the delta brief shows that the agent does not just re-run checks, but also reinterprets progress
 - the sample output and live CLI wording should stay consistent
 
 ## 7. Suggested demo assets
@@ -67,3 +76,7 @@ Open these assets first during presentation prep:
 - `examples/sample_outputs/qris_payment_bot_report.txt`
 - `examples/sample_outputs/qris_payment_bot_report.json`
 - `examples/sample_outputs/qris_payment_bot_followup_result.json`
+
+## 8. Best one-line autonomy claim
+
+> Repo Readiness Agent is a compact single-agent loop that inspects a repo, judges its readiness, generates the next improvement brief, then follows up later with a delta brief until the target state is reached.
