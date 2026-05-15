@@ -36,7 +36,7 @@ def load_fetcher(dynamic: bool, stealthy: bool):
         from scrapling.fetchers import DynamicFetcher, Fetcher, StealthyFetcher
     except Exception as exc:  # pragma: no cover
         raise SystemExit(
-            "Scrapling is not installed. Run: python3 -m pip install -r requirements-scrapling.txt"
+            "Scrapling is not installed. Run: python3 -m pip install -r tools/scrapling_browser/requirements.txt"
         ) from exc
 
     if stealthy:

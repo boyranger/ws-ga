@@ -43,16 +43,17 @@ Add whatever helps you do your job. This is your cheat sheet.
 
 ### Local helper
 
-- CLI: `python3 tools/scrapling_browser.py`
-- Docs: `tools/README-scrapling.md`
-- Dependencies: `requirements-scrapling.txt`
+- Folder: `tools/scrapling_browser`
+- CLI: `python3 tools/scrapling_browser/scrapling_browser.py`
+- Docs: `tools/scrapling_browser/README.md`
+- Dependencies: `tools/scrapling_browser/requirements.txt`
 
 ### Quick examples
 
-- Fetch page text: `python3 tools/scrapling_browser.py fetch https://example.com`
-- Extract CSS: `python3 tools/scrapling_browser.py fetch https://example.com --css 'h1::text'`
-- List links: `python3 tools/scrapling_browser.py links https://example.com`
-- Find text: `python3 tools/scrapling_browser.py text https://example.com --find 'pricing' --partial --all`
+- Fetch page text: `python3 tools/scrapling_browser/scrapling_browser.py fetch https://example.com`
+- Extract CSS: `python3 tools/scrapling_browser/scrapling_browser.py fetch https://example.com --css 'h1::text'`
+- List links: `python3 tools/scrapling_browser/scrapling_browser.py links https://example.com`
+- Find text: `python3 tools/scrapling_browser/scrapling_browser.py text https://example.com --find 'pricing' --partial --all`
 
 ## Related
 
