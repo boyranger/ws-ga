@@ -1,6 +1,10 @@
 """Product-facing contracts for Repo Readiness Agent."""
 
-from dataclasses import dataclass
+from __future__ import annotations
+
+import json
+from dataclasses import asdict, dataclass
+from pathlib import Path
 from typing import Literal
 
 Stage = Literal["Prototype", "MVP", "Handoff-ready"]
@@ -38,3 +42,26 @@ class ProductReport:
     top_fixes: list[str]
     gates: FounderGates | None = None
     follow_up: FollowUpStatus | None = None
+
+
+def product_report_to_dict(report: ProductReport) -> dict:
+    return asdict(report)
+
+
+def product_report_to_json(report: ProductReport) -> str:
+    return json.dumps(product_report_to_dict(report), indent=2, ensure_ascii=False)
+
+
+def load_product_report(path: str | Path) -> ProductReport:
+    data = json.loads(Path(path).read_text())
+    gates = data.get("gates")
+    follow_up = data.get("follow_up")
+    return ProductReport(
+        stage=data["stage"],
+        verdict=data["verdict"],
+        confidence=data["confidence"],
+        top_risks=data["top_risks"],
+        top_fixes=data["top_fixes"],
+        gates=FounderGates(**gates) if gates else None,
+        follow_up=FollowUpStatus(**follow_up) if follow_up else None,
+    )

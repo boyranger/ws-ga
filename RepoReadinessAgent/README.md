@@ -92,8 +92,9 @@ Current product-layer modules:
 - `src/repo_readiness_agent/cli.py` - product-layer CLI entrypoint
 
 Example run:
-- `PYTHONPATH=src python3 -m repo_readiness_agent.cli https://github.com/owner/repo`
-- `PYTHONPATH=src python3 -m repo_readiness_agent.cli https://github.com/owner/repo --format json`
+- `PYTHONPATH=src python3 -m repo_readiness_agent.cli inspect https://github.com/owner/repo`
+- `PYTHONPATH=src python3 -m repo_readiness_agent.cli inspect https://github.com/owner/repo --format json`
+- `PYTHONPATH=src python3 -m repo_readiness_agent.cli followup examples/sample_outputs/qris_payment_bot_followup_before.json examples/sample_outputs/qris_payment_bot_followup_after.json`
 
 ## Demo artifacts already in repo
 

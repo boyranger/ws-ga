@@ -27,6 +27,7 @@ Suggested close:
 
 Suggested sample to open first:
 - `examples/sample_outputs/qris_payment_bot_report.txt`
+- or run `PYTHONPATH=src python3 -m repo_readiness_agent.cli inspect <repo-url>`
 
 ---
 
@@ -70,6 +71,7 @@ Suggested follow-up artifacts to show:
 - `examples/sample_outputs/qris_payment_bot_followup_before.json`
 - `examples/sample_outputs/qris_payment_bot_followup_after.json`
 - `examples/sample_outputs/qris_payment_bot_followup_result.json`
+- or run `PYTHONPATH=src python3 -m repo_readiness_agent.cli followup examples/sample_outputs/qris_payment_bot_followup_before.json examples/sample_outputs/qris_payment_bot_followup_after.json`
 
 ---
 
