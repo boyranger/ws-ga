@@ -26,6 +26,8 @@ Notes:
 
 ## Usage
 
+This helper is meant to be practical for GitHub code hunting.
+
 Fetch visible page text:
 
 ```bash
@@ -60,6 +62,36 @@ Use stealthier browser fetching:
 
 ```bash
 python3 tools/scrapling_browser/scrapling_browser.py fetch https://example.com --stealthy --headless --network-idle
+```
+
+Search GitHub repositories:
+
+```bash
+python3 tools/scrapling_browser/scrapling_browser.py github-search 'fastapi auth middleware'
+```
+
+Search GitHub code result pages:
+
+```bash
+python3 tools/scrapling_browser/scrapling_browser.py github-search 'useSWR cache key' --search-type code
+```
+
+Extract a repo README:
+
+```bash
+python3 tools/scrapling_browser/scrapling_browser.py github-readme https://github.com/tiangolo/fastapi
+```
+
+List useful links from a GitHub repo/page:
+
+```bash
+python3 tools/scrapling_browser/scrapling_browser.py github-links https://github.com/tiangolo/fastapi
+```
+
+Find code-ish text on a fetched GitHub page:
+
+```bash
+python3 tools/scrapling_browser/scrapling_browser.py code-find https://github.com/tiangolo/fastapi --find 'from fastapi import FastAPI'
 ```
 
 ## Output format
